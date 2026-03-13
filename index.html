@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axalith Cloud | Core</title>
+    </head>
+<body>
+    <div id="app">
+        <h1>Axalith Cloud</h1>
+        <p>Connecting to infrastructure...</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        
+        // 代表の Firebase 設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
+            authDomain: "axalith-cloud.firebaseapp.com",
+            projectId: "axalith-cloud",
+            storageBucket: "axalith-cloud.firebasestorage.app",
+            messagingSenderId: "938510930021",
+            appId: "1:938510930021:web:6037bbedd87519f55db68c",
+            measurementId: "G-76RMP31JB7"
+        };
+
+        // 初期化
+        const app = initializeApp(firebaseConfig);
+        console.log("Axalith Cloud: System Online");
+    </script>
+</body>
+</html>
