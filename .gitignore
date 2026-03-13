@@ -1,0 +1,33 @@
+# --- Firebase & Security (機密情報の保護) ---
+# 将来的にAPIキーを逃がすための設定
+.env
+.env.local
+.env.*.local
+secrets.js
+config.local.js
+firebase-key.json
+
+# --- OS / Editor (Alienware & Cursor 用) ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.cursor/
+*.log
+*.tmp
+*.bak
+
+# --- Node.js / Build Tools (将来の拡張用) ---
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dist/
+build/
+.cache/
+
+# --- Virtualization / Large Files (仮想環境などのゴミ) ---
+*.iso
+*.vhd
+*.vhdx
+*.img
