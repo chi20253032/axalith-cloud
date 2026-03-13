@@ -3,18 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axalith Cloud | Core</title>
-    </head>
+    <title>Axalith Cloud | Infrastructure</title>
+    <style>
+        :root {
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --accent-color: #00d2ff;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* 大阪の夜空をイメージした深いグラデーション */
+            background: radial-gradient(circle at top right, #1e3c72, #2a5298, #000000);
+            font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 3rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 400px;
+            width: 85%;
+            animation: fadeIn 1s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, #ffffff, var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 12px var(--accent-color);
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        /* 明日実装するログインフォームのプレースホルダー */
+        .placeholder-btn {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-color);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .placeholder-btn:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
 <body>
-    <div id="app">
+
+    <div class="glass-panel">
+        <div class="status-badge">
+            <span class="status-dot"></span>
+            System Online
+        </div>
         <h1>Axalith Cloud</h1>
-        <p>Connecting to infrastructure...</p>
+        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
+            PenguinMOD Infrastructure
+        </p>
+
+        <div id="auth-container">
+            <button class="placeholder-btn" onclick="console.log('Setup ready for Saturday')">
+                Initializing System...
+            </button>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         
-        // 代表の Firebase 設定
+        // 代表の Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
@@ -25,9 +130,13 @@
             measurementId: "G-76RMP31JB7"
         };
 
-        // 初期化
-        const app = initializeApp(firebaseConfig);
-        console.log("Axalith Cloud: System Online");
+        // Firebase 初期化
+        try {
+            const app = initializeApp(firebaseConfig);
+            console.log("Axalith Cloud Core: Connection Established");
+        } catch (error) {
+            console.error("Initialization Failed:", error);
+        }
     </script>
 </body>
 </html>
