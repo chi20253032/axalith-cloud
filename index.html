@@ -3,123 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axalith Cloud | Infrastructure</title>
+    <title>Axalith Cloud Portal</title>
     <style>
+        /* --- Axalith Crystal UI: 独自デザイン定義 --- */
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --accent-color: #00d2ff;
-            --text-primary: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
+            --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+            --prism-edge: rgba(255, 255, 255, 0.4);
+            --neon-glow: rgba(0, 200, 255, 0.6);
+            --bg-color: #020617;
         }
 
-        body {
+        body, html {
             margin: 0;
-            height: 100vh;
+            padding: 0;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
-            /* 大阪の夜空をイメージした深いグラデーション */
-            background: radial-gradient(circle at top right, #1e3c72, #2a5298, #000000);
-            font-family: 'Inter', 'Segoe UI', -apple-system, sans-serif;
-            color: var(--text-primary);
+            background: radial-gradient(circle at 50% 50%, #1e293b 0%, var(--bg-color) 100%);
+            font-family: 'Inter', 'Segoe UI', sans-serif;
             overflow: hidden;
+            color: white;
         }
 
-        .glass-panel {
+        /* 背景の装飾（モダンな演出） */
+        .bg-glow {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 149, 255, 0.1) 0%, transparent 70%);
+            filter: blur(60px);
+            z-index: 1;
+        }
+
+        /* クリスタルパネル本体 */
+        .crystal-panel {
+            position: relative;
+            width: 400px;
+            padding: 3.5rem;
             background: var(--glass-bg);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(35px) saturate(160%);
+            -webkit-backdrop-filter: blur(35px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--prism-edge);
+            border-left: 1px solid var(--prism-edge);
             border-radius: 28px;
-            padding: 3rem;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.8);
             text-align: center;
-            max-width: 400px;
-            width: 85%;
-            animation: fadeIn 1s ease-out;
+            animation: floating 8s infinite ease-in-out;
+            z-index: 10;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* 閃光アニメーション演出 */
+        .crystal-panel::before {
+            content: "";
+            position: absolute;
+            top: -50%; left: -150%;
+            width: 40%; height: 200%;
+            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: rotate(30deg);
+            transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .crystal-panel:hover::before { left: 150%; }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(0.5deg); }
         }
 
         h1 {
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(to right, #ffffff, var(--accent-color));
+            font-weight: 200;
+            letter-spacing: 8px;
+            margin-bottom: 2.5rem;
+            background: linear-gradient(to bottom, #fff 0%, #aaa 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 2rem;
-        }
+        .input-group { margin-bottom: 1.5rem; text-align: left; }
 
-        .status-dot {
-            height: 8px;
-            width: 8px;
-            background-color: var(--accent-color);
-            border-radius: 50%;
-            margin-right: 8px;
-            box-shadow: 0 0 12px var(--accent-color);
-        }
-
-        .input-group {
-            margin-bottom: 1rem;
-            text-align: left;
-        }
-
-        /* 明日実装するログインフォームのプレースホルダー */
-        .placeholder-btn {
+        input {
             width: 100%;
-            padding: 12px;
-            background: var(--accent-color);
-            border: none;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px;
+            margin-top: 12px;
             border-radius: 12px;
             color: white;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
+            outline: none;
+            box-sizing: border-box;
+            transition: all 0.3s;
+        }
+        input:focus {
+            border-color: var(--neon-glow);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 15px rgba(0, 200, 255, 0.2);
         }
 
-        .placeholder-btn:hover {
-            transform: scale(1.02);
+        button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 1rem;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
+        button:hover {
+            transform: scale(1.02);
+            background: #e0e0e0;
+            box-shadow: 0 0 30px var(--neon-glow);
+        }
+        button:active { transform: scale(0.98); }
+
+        /* ログイン後のiframeコンテナ（初期は非表示） */
+        #main-app {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 20;
+            background: var(--bg-color);
+        }
+        iframe { width: 100%; height: 100%; border: none; }
     </style>
 </head>
 <body>
 
-    <div class="glass-panel">
-        <div class="status-badge">
-            <span class="status-dot"></span>
-            System Online
-        </div>
-        <h1>Axalith Cloud</h1>
-        <p style="color: var(--text-secondary); margin-bottom: 2rem;">
-            PenguinMOD Infrastructure
-        </p>
+    <div class="bg-glow"></div>
 
-        <div id="auth-container">
-            <button class="placeholder-btn" onclick="console.log('Setup ready for Saturday')">
-                Initializing System...
-            </button>
+    <div class="crystal-panel" id="auth-ui">
+        <h1>AXALITH</h1>
+        <div class="input-group">
+            <input type="email" id="email" placeholder="Identifier" autocomplete="email">
+            <input type="password" id="password" placeholder="Key" autocomplete="current-password">
         </div>
+        <button id="connect-btn">INITIALIZE CONNECTION</button>
+    </div>
+
+    <div id="main-app">
+        <iframe id="pm-iframe" src="about:blank"></iframe>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        
-        // 代表の Firebase Configuration
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // 代表の提供した最新Config
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
@@ -130,13 +166,53 @@
             measurementId: "G-76RMP31JB7"
         };
 
-        // Firebase 初期化
-        try {
-            const app = initializeApp(firebaseConfig);
-            console.log("Axalith Cloud Core: Connection Established");
-        } catch (error) {
-            console.error("Initialization Failed:", error);
-        }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+
+        const connectBtn = document.getElementById('connect-btn');
+        const authUI = document.getElementById('auth-ui');
+        const mainApp = document.getElementById('main-app');
+        const iframe = document.getElementById('pm-iframe');
+
+        connectBtn.addEventListener('click', async () => {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if(!email || !password) return alert("Please enter credentials.");
+
+            try {
+                connectBtn.innerText = "SYNCHRONIZING...";
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                
+                console.log("Axalith Authenticated:", userCredential.user.uid);
+                
+                // 成功時の演出：パネルをフェードアウトさせてiframeを表示
+                authUI.style.transition = "all 0.8s ease";
+                authUI.style.opacity = "0";
+                authUI.style.transform = "scale(0.9) translateY(-20px)";
+
+                setTimeout(() => {
+                    authUI.style.display = "none";
+                    mainApp.style.display = "block";
+                    // ここにPenguinModのURLをセット
+                    iframe.src = "https://penguinmod.com/editor"; // テスト用、本番URLがあれば差し替え
+                    
+                    // iframeのロード完了を待ってpostMessageを送信
+                    iframe.onload = () => {
+                        iframe.contentWindow.postMessage({
+                            type: 'AXALITH_CONNECT',
+                            uid: userCredential.user.uid,
+                            status: 'authorized'
+                        }, "*");
+                    };
+                }, 800);
+
+            } catch (error) {
+                console.error("Connection Failed:", error.message);
+                alert("Access Denied: " + error.message);
+                connectBtn.innerText = "INITIALIZE CONNECTION";
+            }
+        });
     </script>
 </body>
 </html>
