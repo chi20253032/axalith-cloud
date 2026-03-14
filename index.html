@@ -2,156 +2,145 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axalith Cloud - Integrated Neural Gate</title>
+    <title>Axalith Cloud - Neural Fusion</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <style>
-        :root { --glow: #00f2ff; --bg: #000; --glass: rgba(0, 242, 255, 0.05); }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--glow); font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif; overflow: hidden; }
+        :root { --glow: #00f2ff; --bg: #000; --panel: rgba(255, 255, 255, 0.03); --glass: rgba(0, 242, 255, 0.1); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--glow); font-family: 'Inter', 'Segoe UI', sans-serif; overflow: hidden; }
         
-        .bg-layer { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at center, #001a1a 0%, #000 100%); z-index: -1; }
+        /* Liquid Glass Background */
+        .bg { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at 50% 50%, #002a2a 0%, #000 100%); z-index: -1; }
+        .bg::after { content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: url('https://www.transparenttextures.com/patterns/carbon-fibre.png'); opacity: 0.1; }
 
-        .container { display: flex; align-items: center; justify-content: center; height: 100vh; transition: 1s cubic-bezier(0.7, 0, 0.3, 1); }
-        .fade-out { opacity: 0; transform: scale(1.1); filter: blur(20px); }
+        .container { display: flex; align-items: center; justify-content: center; height: 100vh; transition: 1.2s cubic-bezier(0.8, 0, 0.2, 1); }
+        .fade-out { opacity: 0; transform: scale(1.1) rotateX(10deg); filter: blur(30px); }
 
         .glass-card {
-            border: 1px solid rgba(0, 242, 255, 0.2);
-            background: var(--glass);
-            backdrop-filter: blur(30px);
-            padding: 60px 80px;
-            border-radius: 40px;
+            border: 1px solid rgba(0, 242, 255, 0.3);
+            background: var(--panel);
+            backdrop-filter: blur(40px);
+            padding: 60px;
+            border-radius: 50px;
             text-align: center;
-            box-shadow: 0 0 80px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(0, 242, 255, 0.05);
-            max-width: 500px;
-            width: 90%;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), inset 0 0 20px var(--glass);
+            width: 90%; max-width: 500px;
         }
 
-        h1 { font-weight: 100; letter-spacing: 15px; font-size: 2.5rem; margin-bottom: 40px; text-shadow: 0 0 20px var(--glow); }
+        h1 { font-weight: 100; letter-spacing: 15px; font-size: 2.2rem; margin-bottom: 40px; color: #fff; text-shadow: 0 0 20px var(--glow); }
 
-        .btn-group { display: flex; flex-direction: column; gap: 20px; }
+        .btn-group { display: flex; flex-direction: column; gap: 18px; }
         button {
-            background: transparent; color: var(--glow); border: 1px solid var(--glow);
-            padding: 18px 40px; border-radius: 16px; font-weight: 900; cursor: pointer;
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); letter-spacing: 3px; font-size: 1rem;
+            background: rgba(255, 255, 255, 0.05); color: var(--glow); border: 1px solid rgba(0, 242, 255, 0.4);
+            padding: 20px; border-radius: 20px; font-weight: 900; cursor: pointer;
+            transition: 0.5s; letter-spacing: 4px; font-size: 0.9rem; text-transform: uppercase;
         }
-        button:hover { background: var(--glow); color: #000; box-shadow: 0 0 40px var(--glow); transform: translateY(-5px); }
-        button:active { transform: scale(0.95); }
-
-        .info-panel { margin-top: 35px; font-size: 0.8rem; opacity: 0.6; letter-spacing: 2px; height: 20px; }
+        button:hover { background: var(--glow); color: #000; box-shadow: 0 0 50px var(--glow); transform: translateY(-8px); }
         
-        /* ダッシュボード表示用 */
+        .link-btn { border-color: #ff00ff; color: #ff00ff; margin-top: 20px; font-size: 0.7rem; display: none; }
+        .link-btn:hover { background: #ff00ff; color: #000; box-shadow: 0 0 50px #ff00ff; }
+
+        .status-info { margin-top: 30px; font-size: 0.7rem; opacity: 0.5; letter-spacing: 3px; }
+        
         #dash-ui { display: none; }
-        .sync-pulse { width: 12px; height: 12px; background: var(--glow); border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 15px var(--glow); animation: pulse 2s infinite; }
-        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.3; } 100% { transform: scale(1); opacity: 1; } }
+        .data-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .data-item { background: rgba(0, 242, 255, 0.05); padding: 15px; border-radius: 15px; border: 1px solid rgba(0, 242, 255, 0.1); }
     </style>
 </head>
 <body>
-    <div class="bg-layer"></div>
-    <div class="container" id="app-viewport">
+    <div class="bg"></div>
+    <div class="container" id="view">
         <div class="glass-card">
-            <h1 id="main-title">AXALITH CLOUD</h1>
+            <h1 id="header">AXALITH CORE</h1>
             
             <div id="login-ui" class="btn-group">
-                <button id="google-trigger">GOOGLE CONNECT</button>
-                <button id="scratch-trigger">SCRATCH AUTH</button>
+                <button id="g-login">Google Access</button>
+                <button id="s-login">Scratch Pulse</button>
             </div>
 
             <div id="dash-ui">
-                <div style="font-size: 1.2rem; margin-bottom: 20px;">
-                    <span class="sync-pulse"></span>SYSTEM SYNCHRONIZED
+                <div style="font-size: 0.8rem; opacity: 0.6;">SYSTEM LINK ESTABLISHED</div>
+                <div id="user-name" style="font-size: 1.8rem; font-weight: 900; margin: 10px 0;">---</div>
+                <div class="data-grid">
+                    <div class="data-item"><div style="font-size: 0.6rem;">RANK</div><div id="d-rank">USER</div></div>
+                    <div class="data-item"><div style="font-size: 0.6rem;">CREDIT</div><div id="d-credit">0</div></div>
                 </div>
-                <div id="user-display" style="font-weight: 900; letter-spacing: 4px;">GUEST_USER</div>
+                <button id="link-google" class="link-btn">Link Google Account</button>
             </div>
 
-            <div id="info-text" class="info-panel">SYSTEM READY</div>
+            <div id="status" class="status-info">AWAITING NEURAL LINK...</div>
         </div>
     </div>
 
     <script>
-        // --- Firebase Configuration ---
-        const firebaseConfig = {
+        const fbConf = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
             projectId: "axalith-cloud",
             storageBucket: "axalith-cloud.firebasestorage.app",
             messagingSenderId: "938510930021",
-            appId: "1:938510930021:web:6037bbedd87519f55db68c",
-            measurementId: "G-76RMP31JB7"
+            appId: "1:938510930021:web:6037bbedd87519f55db68c"
         };
-        firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(fbConf);
+        const db = firebase.firestore();
 
-        const appViewport = document.getElementById('app-viewport');
-        const infoText = document.getElementById('info-text');
         const params = new URLSearchParams(window.location.search);
         const mode = params.get('mode');
 
-        // --- 画面遷移ロジック ---
-        const transitionToDash = (newParams) => {
-            appViewport.classList.add('fade-out');
-            setTimeout(() => {
-                window.location.search = new URLSearchParams(newParams).toString();
-            }, 800);
-        };
-
-        // --- 初期ロード判定 ---
-        window.onload = () => {
+        window.onload = async () => {
             if (mode) {
-                // ダッシュボードモードの表示切り替え
                 document.getElementById('login-ui').style.display = 'none';
                 document.getElementById('dash-ui').style.display = 'block';
-                document.getElementById('main-title').innerText = "DASHBOARD";
-                document.getElementById('user-display').innerText = (params.get('name') || params.get('user')).toUpperCase();
-                infoText.innerText = "WAITING FOR CORE HANDSHAKE...";
+                document.getElementById('header').innerText = "DASHBOARD";
+                const uName = params.get('name') || params.get('user');
+                document.getElementById('user-name').innerText = uName.toUpperCase();
+                
+                if (mode === 'SCRATCH') document.getElementById('link-google').style.display = 'block';
 
-                // 拡張機能の「HATブロック」を光らせるための最終パルスを送信
-                // このパルスを拡張機能(v3.4)が受信し、自動同期後に各ハットをキックします
-                window.parent.postMessage({
-                    type: 'AXALITH_AUTH_FINAL',
-                    authType: mode,
-                    uid: params.get('uid'),
-                    name: params.get('name'),
-                    user: params.get('user')
-                }, '*');
+                // Fetch Real-time data
+                const id = params.get('uid') || params.get('user');
+                db.collection('users').doc(id).onSnapshot(doc => {
+                    if (doc.exists) {
+                        document.getElementById('d-rank').innerText = doc.data().rank;
+                        document.getElementById('d-credit').innerText = doc.data().credit;
+                    }
+                });
+
+                window.parent.postMessage({ type: 'AXALITH_AUTH_FINAL', authType: mode, uid: params.get('uid'), user: params.get('user') }, '*');
             }
         };
 
-        // --- Googleログイン実行 ---
-        document.getElementById('google-trigger').onclick = () => {
-            infoText.innerText = "ESTABLISHING GOOGLE SECURE LINK...";
+        const nav = (p) => {
+            document.getElementById('view').classList.add('fade-out');
+            setTimeout(() => { window.location.search = new URLSearchParams(p).toString(); }, 1000);
+        };
+
+        document.getElementById('g-login').onclick = () => {
             const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider).then((result) => {
-                const u = result.user;
-                transitionToDash({
-                    mode: 'GOOGLE',
-                    uid: u.uid,
-                    name: u.displayName
-                });
-            }).catch(e => {
-                infoText.innerText = "CONNECTION REFUSED.";
-                console.error(e);
+            firebase.auth().signInWithPopup(provider).then(r => {
+                nav({ mode: 'GOOGLE', uid: r.user.uid, name: r.user.displayName });
             });
         };
 
-        // --- Scratch Auth (拡張機能へのパルス送信) ---
-        document.getElementById('scratch-trigger').onclick = () => {
-            infoText.innerText = "PULSE EMITTED: WAITING FOR CORE...";
-            // 拡張機能側の「onPulseReceived」ハットをキック
-            window.parent.postMessage({
-                type: 'AXALITH_PULSE',
-                label: 'TRIGGER_SCRATCH_AUTH'
-            }, '*');
+        document.getElementById('s-login').onclick = () => {
+            window.parent.postMessage({ type: 'AXALITH_PULSE', label: 'TRIGGER_SCRATCH_AUTH' }, '*');
         };
 
-        // --- 拡張機能からのScratch認証完了通知を待機 ---
-        window.addEventListener('message', (e) => {
-            if (e.data.type === 'NAVIGATE_DASHBOARD') {
-                infoText.innerText = "SCRATCH AUTH VERIFIED.";
-                transitionToDash({
-                    mode: 'SCRATCH',
-                    user: e.data.user
-                });
-            }
+        // Google連携（Scratchユーザー名からGoogle UIDへ移行）
+        document.getElementById('link-google').onclick = () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider).then(async (r) => {
+                const oldId = params.get('user');
+                const newId = r.user.uid;
+                // 拡張機能へ統合命令パルスを飛ばす
+                window.parent.postMessage({ type: 'AXALITH_MIGRATE', oldId: oldId, newId: newId }, '*');
+                nav({ mode: 'GOOGLE', uid: newId, name: r.user.displayName });
+            });
+        };
+
+        window.addEventListener('message', e => {
+            if (e.data.type === 'NAVIGATE_DASHBOARD') nav({ mode: 'SCRATCH', user: e.data.user });
         });
     </script>
 </body>
