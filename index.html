@@ -2,98 +2,110 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axalith Cloud | Bridge Gateway</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Axalith Cloud Gateway</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'neon-cyan': '#00f2ff',
-                        'neon-blue': '#0072ff',
-                        'scratch': '#ffab19',
-                    },
-                    animation: {
-                        'grid-move': 'grid-move 20s linear infinite',
-                        'float': 'float 4s infinite ease-in-out',
-                    }
-                }
-            }
-        }
-    </script>
-    <style type="text/css">
-        /* Tailwindで表現しきれない高度な背景エフェクトを維持 */
-        .bg-grid {
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            transform: perspective(500px) rotateX(60deg) translateY(-20%);
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            background-color: #050505;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            color: white;
         }
 
-        @keyframes grid-move { 
-            from { transform: perspective(500px) rotateX(60deg) translateY(0); } 
-            to { transform: perspective(500px) rotateX(60deg) translateY(50px); } 
+        /* Liquid Glass アニメーション背景 */
+        .glass-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 100%);
         }
 
-        @keyframes float { 
-            0%, 100% { transform: translateY(0); } 
-            50% { transform: translateY(-10px); } 
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.15) 0%, rgba(0, 102, 255, 0.15) 100%);
+            filter: blur(80px);
+            border-radius: 50%;
+            animation: move 20s infinite alternate;
         }
 
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(50px) saturate(210%);
-            -webkit-backdrop-filter: blur(50px) saturate(210%);
+        @keyframes move {
+            from { transform: translate(-10%, -10%) scale(1); }
+            to { transform: translate(20%, 20%) scale(1.2); }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+        }
+
+        .btn-expressive {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .btn-expressive:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
+        }
+
+        /* フェードアウト用アニメーション */
+        .fade-out {
+            opacity: 0;
+            transform: scale(1.1);
+            transition: all 0.8s ease-in-out;
         }
     </style>
 </head>
-<body class="bg-black m-0 p-0 h-screen flex justify-center items-center font-['Inter','Noto_Sans_JP',sans-serif] text-white overflow-hidden relative">
+<body class="flex items-center justify-center">
 
-    <div class="absolute inset-0 z-[-1] overflow-hidden">
-        <div class="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(0,114,255,0.2)_0%,transparent_45%),radial-gradient(circle_at_90%_80%,rgba(0,242,255,0.15)_0%,transparent_45%)]"></div>
-        <div class="bg-grid absolute w-[200%] h-[200%] animate-grid-move"></div>
+    <div class="glass-bg">
+        <div class="blob" style="top: -10%; left: -10%;"></div>
+        <div class="blob" style="bottom: -10%; right: -10%; animation-delay: -5s; background: linear-gradient(135deg, rgba(255, 0, 255, 0.1) 0%, rgba(0, 102, 255, 0.1) 100%);"></div>
     </div>
 
-    <div class="container relative w-[340px] px-10 py-12 glass-effect border border-white/20 rounded-[40px] text-center shadow-[0_40px_100px_rgba(0,0,0,0.8)]">
+    <div id="app-container" class="w-full h-full flex flex-col items-center justify-center p-6 text-center">
         
-        <div class="logo-area mb-6">
-            <img src="https://raw.githubusercontent.com/chi20253032/Axalith-Cloud/main/logo.png" 
-                 alt="Axalith Logo" 
-                 class="w-[140px] h-auto mx-auto drop-shadow-[0_0_20px_rgba(0,242,255,0.8)] animate-float"
-                 onerror="this.src='https://raw.githubusercontent.com/chi20253032/Axalith-Cloud/master/logo.png'">
+        <div class="mb-10 relative">
+            <div class="absolute inset-0 bg-cyan-500/20 blur-3xl rounded-full"></div>
+            <img src="./logo.png" alt="Axalith" class="relative w-48 h-auto drop-shadow-[0_0_25px_rgba(0,242,255,0.6)] animate-pulse"
+                 onerror="this.src='https://raw.githubusercontent.com/chi20253032/Axalith-Cloud/main/logo.png'">
         </div>
 
-        <h1 class="text-[1.6rem] font-bold m-0 tracking-[2px]">AXALITH CLOUD</h1>
-        <div class="subtitle text-[0.75rem] font-['JetBrains_Mono'] opacity-50 mb-9 leading-tight">
-            認証ブリッジゲートウェイ<br>
-            <span class="text-[0.6rem] opacity-50">AUTHENTICATION BRIDGE</span>
-        </div>
+        <div class="glass-panel p-10 rounded-[40px] max-w-md w-full border-t border-white/20">
+            <h1 class="text-4xl font-extrabold mb-2 tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
+                Axalith Cloud
+            </h1>
+            <p class="text-cyan-400/80 text-sm font-light mb-8 tracking-[0.2em] uppercase">Gateway System v2.0</p>
 
-        <button id="google-login" class="btn w-full p-[18px] mt-4 border-none rounded-[20px] font-bold text-[0.95rem] cursor-pointer transition-all duration-400 flex items-center justify-center gap-3 tracking-wider bg-white text-black hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(255,255,255,0.2)]">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
-            <div class="flex flex-col items-center">
+            <button id="google-login" class="btn-expressive w-full bg-white text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-4 hover:bg-cyan-50">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-6 h-6" alt="Google">
                 <span>Googleでログイン</span>
-                <span class="text-[0.6rem] opacity-70 font-normal">Sign-in with Google</span>
-            </div>
-        </button>
+            </button>
 
-        <button id="scratch-auth" class="btn w-full p-[18px] mt-4 border-none rounded-[20px] font-bold text-[0.95rem] cursor-pointer transition-all duration-400 flex items-center justify-center gap-3 tracking-wider bg-scratch text-white hover:-translate-y-1 hover:shadow-[0_15px_40px_rgba(255,171,25,0.4)]">
-            <div class="flex flex-col items-center">
-                <span>Scratchを連携</span>
-                <span class="text-[0.6rem] opacity-70 font-normal">Link Scratch ID</span>
+            <div class="mt-8 pt-6 border-t border-white/5 text-[10px] text-gray-500 uppercase tracking-widest">
+                Protected by Axalith Security
             </div>
-        </button>
-        
-        <p id="status-msg" class="mt-5 text-[0.8rem] text-neon-cyan min-h-[1.2em] [text-shadow:0_0_10px_#00f2ff] font-['JetBrains_Mono']"></p>
+        </div>
+
+        <div id="status" class="mt-6 text-sm text-cyan-500/50 font-mono">SYSTEM: READY_TO_LINK</div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
@@ -108,45 +120,42 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        const statusMsg = document.getElementById('status-msg');
+        const loginBtn = document.getElementById('google-login');
+        const statusText = document.getElementById('status');
+        const container = document.getElementById('app-container');
 
-        const sendPulse = (type, data = {}) => {
-            const target = window.parent || window.opener;
-            if (target) {
-                console.log(`[Axalith Signal] HIGH (1) -> ${type}`);
-                target.postMessage({ type, value: 1, ...data }, "*");
-                setTimeout(() => {
-                    console.log(`[Axalith Signal] LOW (0) -> ${type}`);
-                    target.postMessage({ type, value: 0 }, "*");
-                }, 500);
-            }
-        };
-
-        document.getElementById('google-login').onclick = async () => {
+        loginBtn.addEventListener('click', async () => {
+            statusText.innerText = "SYSTEM: AUTHENTICATING...";
             try {
-                statusMsg.innerText = "認証中... / AUTHENTICATING...";
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
+
+                statusText.innerText = "SYSTEM: SUCCESS - SENDING DATA";
                 
-                statusMsg.innerText = "認証成功 / GOOGLE_SUCCESS";
-                sendPulse('AXALITH_GOOGLE_SUCCESS', {
+                // PenguinModへデータを送信
+                const messageData = {
+                    type: "AXALITH_GOOGLE_SUCCESS",
                     userName: user.displayName,
                     userEmail: user.email,
-                    userPhoto: user.photoURL
-                });
+                    userPhoto: user.photoURL,
+                    uid: user.uid
+                };
+                
+                window.parent.postMessage(messageData, "*");
 
+                // 演出: フェードアウトしてから閉じる
+                container.classList.add('fade-out');
                 setTimeout(() => {
-                    if (window.opener) window.close();
-                }, 1000);
-            } catch (e) {
-                statusMsg.innerText = "エラー / ERROR: " + e.message;
-            }
-        };
+                    // 自動で閉じない場合はPenguinMod側でiframeを非表示にすることを推奨
+                    console.log("Login complete, data sent.");
+                }, 800);
 
-        document.getElementById('scratch-auth').onclick = () => {
-            statusMsg.innerText = "信号送信中... / SENDING SIGNAL...";
-            sendPulse('AXALITH_AUTH_SIGNAL');
-        };
+            } catch (error) {
+                console.error(error);
+                statusText.innerText = "SYSTEM: ERROR - " + error.code;
+                alert("ログインエラーが発生しました。");
+            }
+        });
     </script>
 </body>
 </html>
