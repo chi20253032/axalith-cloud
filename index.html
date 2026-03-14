@@ -2,160 +2,63 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axalith Cloud Portal</title>
+    <title>Axalith Cloud | Portal</title>
     <style>
-        /* --- Axalith Crystal UI: 独自デザイン定義 --- */
+        /* --- Axalith Crystal UI --- */
         :root {
             --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
             --prism-edge: rgba(255, 255, 255, 0.4);
-            --neon-glow: rgba(0, 200, 255, 0.6);
-            --bg-color: #020617;
+            --neon-blue: #00d4ff;
         }
 
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: radial-gradient(circle at 50% 50%, #1e293b 0%, var(--bg-color) 100%);
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-            overflow: hidden;
-            color: white;
+        body {
+            margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center;
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            font-family: 'Inter', sans-serif; overflow: hidden; color: white;
         }
 
-        /* 背景の装飾（モダンな演出） */
-        .bg-glow {
-            position: absolute;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(0, 149, 255, 0.1) 0%, transparent 70%);
-            filter: blur(60px);
-            z-index: 1;
-        }
-
-        /* クリスタルパネル本体 */
         .crystal-panel {
-            position: relative;
-            width: 400px;
-            padding: 3.5rem;
-            background: var(--glass-bg);
-            backdrop-filter: blur(35px) saturate(160%);
-            -webkit-backdrop-filter: blur(35px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid var(--prism-edge);
-            border-left: 1px solid var(--prism-edge);
-            border-radius: 28px;
-            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.8);
-            text-align: center;
-            animation: floating 8s infinite ease-in-out;
-            z-index: 10;
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; width: 360px; padding: 3rem;
+            background: var(--glass-bg); backdrop-filter: blur(35px) saturate(160%);
+            border: 1px solid rgba(255,255,255,0.1); border-top: 1px solid var(--prism-edge);
+            border-radius: 28px; box-shadow: 0 50px 100px rgba(0,0,0,0.8);
+            text-align: center; animation: floating 8s infinite ease-in-out;
         }
 
-        /* 閃光アニメーション演出 */
-        .crystal-panel::before {
-            content: "";
-            position: absolute;
-            top: -50%; left: -150%;
-            width: 40%; height: 200%;
-            background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.15), transparent);
-            transform: rotate(30deg);
-            transition: 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-        .crystal-panel:hover::before { left: 150%; }
+        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
-        @keyframes floating {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(0.5deg); }
+        h1 { font-weight: 200; letter-spacing: 8px; margin-bottom: 2.5rem; }
+
+        .auth-btn {
+            width: 100%; padding: 14px; margin: 10px 0;
+            border: none; border-radius: 12px; font-weight: 700;
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
 
-        h1 {
-            font-weight: 200;
-            letter-spacing: 8px;
-            margin-bottom: 2.5rem;
-            background: linear-gradient(to bottom, #fff 0%, #aaa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .btn-google { background: white; color: #444; }
+        .btn-google:hover { transform: scale(1.03); box-shadow: 0 0 20px rgba(0, 212, 255, 0.4); }
 
-        .input-group { margin-bottom: 1.5rem; text-align: left; }
-
-        input {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 14px;
-            margin-top: 12px;
-            border-radius: 12px;
-            color: white;
-            outline: none;
-            box-sizing: border-box;
-            transition: all 0.3s;
-        }
-        input:focus {
-            border-color: var(--neon-glow);
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 0 15px rgba(0, 200, 255, 0.2);
-        }
-
-        button {
-            width: 100%;
-            padding: 16px;
-            margin-top: 1rem;
-            background: white;
-            color: black;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        button:hover {
-            transform: scale(1.02);
-            background: #e0e0e0;
-            box-shadow: 0 0 30px var(--neon-glow);
-        }
-        button:active { transform: scale(0.98); }
-
-        /* ログイン後のiframeコンテナ（初期は非表示） */
-        #main-app {
-            display: none;
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: 20;
-            background: var(--bg-color);
-        }
-        iframe { width: 100%; height: 100%; border: none; }
+        .btn-other { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
     </style>
 </head>
 <body>
 
-    <div class="bg-glow"></div>
-
-    <div class="crystal-panel" id="auth-ui">
+    <div class="crystal-panel">
         <h1>AXALITH</h1>
-        <div class="input-group">
-            <input type="email" id="email" placeholder="Identifier" autocomplete="email">
-            <input type="password" id="password" placeholder="Key" autocomplete="current-password">
-        </div>
-        <button id="connect-btn">INITIALIZE CONNECTION</button>
-    </div>
+        
+        <button class="auth-btn btn-google" id="google-login">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Googleで接続
+        </button>
 
-    <div id="main-app">
-        <iframe id="pm-iframe" src="about:blank"></iframe>
+        <button class="auth-btn btn-other" id="scratch-btn">Scratch Auth (Coming Soon)</button>
+        <button class="auth-btn btn-other" id="pm-btn">PenguinMod ID (Coming Soon)</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // 代表の提供した最新Config
+        // 代表の最新Config
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
@@ -168,51 +71,18 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth();
+        const googleProvider = new GoogleAuthProvider();
 
-        const connectBtn = document.getElementById('connect-btn');
-        const authUI = document.getElementById('auth-ui');
-        const mainApp = document.getElementById('main-app');
-        const iframe = document.getElementById('pm-iframe');
-
-        connectBtn.addEventListener('click', async () => {
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            if(!email || !password) return alert("Please enter credentials.");
-
+        document.getElementById('google-login').onclick = async () => {
             try {
-                connectBtn.innerText = "SYNCHRONIZING...";
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                
-                console.log("Axalith Authenticated:", userCredential.user.uid);
-                
-                // 成功時の演出：パネルをフェードアウトさせてiframeを表示
-                authUI.style.transition = "all 0.8s ease";
-                authUI.style.opacity = "0";
-                authUI.style.transform = "scale(0.9) translateY(-20px)";
-
-                setTimeout(() => {
-                    authUI.style.display = "none";
-                    mainApp.style.display = "block";
-                    // ここにPenguinModのURLをセット
-                    iframe.src = "https://penguinmod.com/editor"; // テスト用、本番URLがあれば差し替え
-                    
-                    // iframeのロード完了を待ってpostMessageを送信
-                    iframe.onload = () => {
-                        iframe.contentWindow.postMessage({
-                            type: 'AXALITH_CONNECT',
-                            uid: userCredential.user.uid,
-                            status: 'authorized'
-                        }, "*");
-                    };
-                }, 800);
-
+                const result = await signInWithPopup(auth, googleProvider);
+                alert(`${result.user.displayName}様、Axalith Cloudへようこそ！`);
+                console.log("認証成功:", result.user);
             } catch (error) {
-                console.error("Connection Failed:", error.message);
-                alert("Access Denied: " + error.message);
-                connectBtn.innerText = "INITIALIZE CONNECTION";
+                console.error("エラー詳細:", error);
+                alert("ログインに失敗しました: " + error.message);
             }
-        });
+        };
     </script>
 </body>
 </html>
