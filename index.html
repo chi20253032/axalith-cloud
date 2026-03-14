@@ -2,146 +2,16 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Axalith Cloud Gateway</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;700;900&display=swap" rel="stylesheet">
-    <style>
-        /* ベース設定 */
-        :root {
-            --cyan-glow: rgba(0, 242, 255, 0.4);
-            --blue-glow: rgba(77, 151, 255, 0.4);
-        }
-        body { 
-            background-color: #030303; 
-            color: white; 
-            font-family: 'Outfit', sans-serif; 
-            overflow: hidden; 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
-
-        /* 躍動する背景 (Fluid Mesh Gradient) */
-        .bg-mesh {
-            position: absolute; width: 150vw; height: 150vw;
-            background: 
-                radial-gradient(circle at 20% 30%, rgba(0, 242, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(77, 151, 255, 0.08) 0%, transparent 50%);
-            z-index: 0; 
-            animation: mesh-rotate 30s infinite linear;
-        }
-        @keyframes mesh-rotate { 100% { transform: rotate(360deg); } }
-
-        /* Liquid Glass メインパネル */
-        .glass-panel {
-            position: relative; z-index: 10;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-            backdrop-filter: blur(40px) saturate(150%);
-            -webkit-backdrop-filter: blur(40px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-top: 1px solid rgba(255, 255, 255, 0.3); /* 上部のハイライトで立体感を強調 */
-            border-radius: 40px;
-            box-shadow: 
-                0 30px 60px rgba(0, 0, 0, 0.6),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            width: 100%; max-width: 380px; padding: 40px 30px; text-align: center;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        /* パネル背後の環境光 */
-        .panel-glow {
-            position: absolute; inset: -2px; z-index: -1;
-            border-radius: 42px;
-            background: linear-gradient(45deg, var(--cyan-glow), transparent, var(--blue-glow));
-            filter: blur(20px); opacity: 0.5;
-            animation: pulse-glow 4s infinite alternate;
-        }
-        @keyframes pulse-glow { 0% { opacity: 0.3; } 100% { opacity: 0.7; } }
-
-        /* 入場アニメーション群 */
-        .animate-enter { opacity: 0; transform: translateY(20px); animation: enter-up 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-        .delay-1 { animation-delay: 0.1s; }
-        .delay-2 { animation-delay: 0.2s; }
-        .delay-3 { animation-delay: 0.3s; }
-        .delay-4 { animation-delay: 0.4s; }
-        @keyframes enter-up { to { opacity: 1; transform: translateY(0); } }
-
-        /* ボタンの共通スタイルとホバー/アクティブアクション */
-        .auth-btn {
-            position: relative; overflow: hidden;
-            display: flex; items-center; justify-content: center; gap: 12px;
-            width: 100%; padding: 16px; border-radius: 20px;
-            font-weight: 700; font-size: 15px; letter-spacing: 0.5px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer; border: none;
-        }
-        .auth-btn::after { /* ボタン内のリップル/光沢エフェクト */
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: 0.5s;
-        }
-        .auth-btn:hover::after { left: 150%; }
-        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-        .auth-btn:active { transform: translateY(1px) scale(0.97); box-shadow: 0 5px 10px rgba(0,0,0,0.4); }
-
-        .btn-google { background: #ffffff; color: #111111; }
-        .btn-scratch { 
-            background: linear-gradient(135deg, #4d97ff, #2b7afc); 
-            color: #ffffff; 
-            border-top: 1px solid rgba(255,255,255,0.4);
-            box-shadow: 0 8px 25px rgba(77, 151, 255, 0.3);
-        }
-
-        /* 成功時の退出アニメーション (JSで付与) */
-        .gateway-exit { transform: scale(1.1) translateY(-10px) !important; opacity: 0 !important; pointer-events: none; }
-    </style>
+    <title>Axalith OS - Login Gateway</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
-<body>
+<body style="background: #000; color: #00f2ff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
+    <h1>Axalith OS Gateway</h1>
+    <div id="status">システム待機中...</div>
+    <button id="google-login" style="margin-top: 20px; padding: 10px 20px; cursor: pointer;">Googleで連携・ログイン</button>
 
-    <div class="bg-mesh"></div>
-
-    <div id="main-panel" class="glass-panel">
-        <div class="panel-glow"></div>
-
-        <div class="animate-enter delay-1">
-            <img src="./logo.png" class="w-24 h-24 mx-auto mb-4 drop-shadow-[0_0_20px_rgba(0,242,255,0.6)] object-contain" 
-                 onerror="this.src='https://raw.githubusercontent.com/chi20253032/Axalith-Cloud/main/logo.png'">
-            <h1 class="text-3xl font-black tracking-tighter mb-1">Axalith Cloud</h1>
-            <p class="text-[9px] text-cyan-400 tracking-[0.4em] uppercase mb-8 font-bold opacity-80">Gateway System v3.0</p>
-        </div>
-
-        <div class="flex flex-col gap-4 animate-enter delay-2">
-            <button id="google-btn" class="auth-btn btn-google">
-                <svg width="22" height="22" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                <span id="google-text">Googleでログイン</span>
-            </button>
-
-            <button id="scratch-btn" class="auth-btn btn-scratch">
-                <img src="https://scratch.mit.edu/favicon.ico" class="w-6 h-6 rounded-md shadow-sm bg-white p-[2px]">
-                <span id="scratch-text">Scratch Auth</span>
-            </button>
-        </div>
-
-        <div class="animate-enter delay-3 mt-8">
-            <div id="status-indicator" class="flex items-center justify-center gap-2 text-[10px] font-mono text-gray-400 tracking-widest uppercase bg-black/30 rounded-full py-2 px-4 inline-flex border border-white/5 shadow-inner">
-                <div id="status-dot" class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
-                <span id="status-text">Awaiting Connection</span>
-            </div>
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
@@ -150,89 +20,37 @@
             messagingSenderId: "938510930021",
             appId: "1:938510930021:web:6037bbedd87519f55db68c"
         };
+        firebase.initializeApp(firebaseConfig);
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
+        const provider = new firebase.auth.GoogleAuthProvider();
 
-        const panel = document.getElementById('main-panel');
-        const statusText = document.getElementById('status-text');
-        const statusDot = document.getElementById('status-dot');
-        const googleBtnText = document.getElementById('google-text');
-        const scratchBtnText = document.getElementById('scratch-text');
+        document.getElementById('google-login').onclick = () => {
+            const user = firebase.auth().currentUser;
 
-        // ★ 完全維持：全方位パルス送信機能
-        const sendPulse = (payload) => {
-            console.log("Axalith: Attempting to send pulse...", payload);
-            if (window.parent && window.parent !== window) {
-                window.parent.postMessage(payload, "*");
-            }
-            if (window.opener && window.opener !== window) {
-                window.opener.postMessage(payload, "*");
-            }
-        };
-
-        // 成功時のUI更新とダッシュボードへの遷移アニメーション
-        const transitionToDashboard = (method) => {
-            statusDot.classList.replace('bg-yellow-500', 'bg-cyan-400');
-            statusText.innerText = "ACCESS GRANTED";
-            statusText.classList.add('text-cyan-400');
-            
-            // パネルがフワッと拡大しながら消えるアニメーション
-            panel.classList.add('gateway-exit');
-            
-            // アニメーション完了後に dashboard.html へ遷移
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 600);
-        };
-
-        // ================= Google 認証ロジック =================
-        document.getElementById('google-btn').onclick = async () => {
-            googleBtnText.innerText = "認証中...";
-            statusText.innerText = "AUTHENTICATING...";
-            statusDot.classList.replace('bg-yellow-500', 'bg-blue-400');
-            
-            try {
-                const res = await signInWithPopup(auth, provider);
-                // パルス送信 (OS側へ)
-                sendPulse({
-                    type: "AXALITH_GOOGLE_SUCCESS",
-                    value: 1,
-                    userName: res.user.displayName,
-                    userEmail: res.user.email,
-                    userPhoto: res.user.photoURL
+            if (user) {
+                // すでにログイン（Scratch等）している場合は「リンク」
+                user.linkWithPopup(provider).then((result) => {
+                    sendToDashboard(result.user, true);
+                }).catch((error) => {
+                    // すでにGoogle垢がある場合は普通にサインイン
+                    firebase.auth().signInWithPopup(provider).then((result) => {
+                        sendToDashboard(result.user, false);
+                    });
                 });
-                
-                // 状態保存と遷移
-                localStorage.setItem('axalith_auth_method', 'google');
-                googleBtnText.innerText = "接続完了";
-                transitionToDashboard('google');
-                
-            } catch (err) {
-                statusText.innerText = "AUTH_ERROR: " + err.code;
-                statusDot.classList.replace('bg-blue-400', 'bg-red-500');
-                googleBtnText.innerText = "Googleでログイン";
+            } else {
+                firebase.auth().signInWithPopup(provider).then((result) => {
+                    sendToDashboard(result.user, false);
+                });
             }
         };
 
-        // ================= Scratch Auth ロジック =================
-        document.getElementById('scratch-btn').onclick = () => {
-            scratchBtnText.innerText = "同期中...";
-            statusText.innerText = "SCRATCH_SYNCING...";
-            statusDot.classList.replace('bg-yellow-500', 'bg-blue-400');
-            
-            // パルス送信 (OS側へ)
-            sendPulse({ type: "AXALITH_AUTH_SIGNAL", value: 1 });
-            
+        function sendToDashboard(user, isLinked) {
+            document.getElementById('status').innerText = "認証成功。ダッシュボードへ転送中...";
+            // UIDと連携フラグをURLパラメータに付与
             setTimeout(() => {
-                // 状態保存と遷移
-                localStorage.setItem('axalith_auth_method', 'scratch');
-                localStorage.setItem('axalith_scratch_user', 'AzumoAurora3032'); // 仮ユーザー名
-                scratchBtnText.innerText = "同期完了";
-                transitionToDashboard('scratch');
-            }, 800);
-        };
+                window.location.href = `dashboard.html?uid=${user.uid}&name=${encodeURIComponent(user.displayName)}&photo=${encodeURIComponent(user.photoURL)}&linked=${isLinked}`;
+            }, 1000);
+        }
     </script>
 </body>
 </html>
