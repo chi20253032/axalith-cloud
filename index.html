@@ -2,59 +2,74 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Axalith Cloud - Dual Auth Gate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axalith Cloud - Integrated Neural Gate</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <style>
-        :root { --main: #00f2ff; --bg: #000; }
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--main); font-family: 'Segoe UI', sans-serif; overflow: hidden; }
-        .container { display: flex; align-items: center; justify-content: center; height: 100vh; transition: 1s cubic-bezier(0.7, 0, 0.3, 1); }
-        .fade-out { opacity: 0; transform: scale(1.1) filter(blur(20px)); }
+        :root { --glow: #00f2ff; --bg: #000; --glass: rgba(0, 242, 255, 0.05); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--glow); font-family: 'Segoe UI', 'Hiragino Kaku Gothic ProN', sans-serif; overflow: hidden; }
         
+        .bg-layer { position: fixed; width: 100%; height: 100%; background: radial-gradient(circle at center, #001a1a 0%, #000 100%); z-index: -1; }
+
+        .container { display: flex; align-items: center; justify-content: center; height: 100vh; transition: 1s cubic-bezier(0.7, 0, 0.3, 1); }
+        .fade-out { opacity: 0; transform: scale(1.1); filter: blur(20px); }
+
         .glass-card {
-            border: 1px solid rgba(0, 242, 255, 0.3);
-            background: rgba(0, 242, 255, 0.05);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            background: var(--glass);
             backdrop-filter: blur(30px);
-            padding: 50px 80px;
+            padding: 60px 80px;
             border-radius: 40px;
             text-align: center;
-            box-shadow: 0 0 60px rgba(0, 0, 0, 0.9);
+            box-shadow: 0 0 80px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(0, 242, 255, 0.05);
+            max-width: 500px;
+            width: 90%;
         }
 
-        h1 { font-weight: 100; letter-spacing: 12px; font-size: 2.8rem; margin-bottom: 40px; text-shadow: 0 0 20px var(--main); }
-        .btn-group { display: flex; flex-direction: column; gap: 15px; }
-        
+        h1 { font-weight: 100; letter-spacing: 15px; font-size: 2.5rem; margin-bottom: 40px; text-shadow: 0 0 20px var(--glow); }
+
+        .btn-group { display: flex; flex-direction: column; gap: 20px; }
         button {
-            background: transparent; color: var(--main); border: 1px solid var(--main);
-            padding: 18px 40px; border-radius: 15px; font-weight: 900; cursor: pointer;
-            transition: 0.3s; letter-spacing: 2px;
+            background: transparent; color: var(--glow); border: 1px solid var(--glow);
+            padding: 18px 40px; border-radius: 16px; font-weight: 900; cursor: pointer;
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); letter-spacing: 3px; font-size: 1rem;
         }
-        button:hover { background: var(--main); color: #000; box-shadow: 0 0 40px var(--main); }
+        button:hover { background: var(--glow); color: #000; box-shadow: 0 0 40px var(--glow); transform: translateY(-5px); }
+        button:active { transform: scale(0.95); }
 
-        #status-info { margin-top: 25px; font-size: 0.8rem; opacity: 0.7; }
-        .dashboard-ui { display: none; font-size: 1.5rem; letter-spacing: 5px; animation: glow 2s infinite alternate; }
-        @keyframes glow { from { opacity: 0.5; } to { opacity: 1; } }
+        .info-panel { margin-top: 35px; font-size: 0.8rem; opacity: 0.6; letter-spacing: 2px; height: 20px; }
+        
+        /* ダッシュボード表示用 */
+        #dash-ui { display: none; }
+        .sync-pulse { width: 12px; height: 12px; background: var(--glow); border-radius: 50%; display: inline-block; margin-right: 10px; box-shadow: 0 0 15px var(--glow); animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.5); opacity: 0.3; } 100% { transform: scale(1); opacity: 1; } }
     </style>
 </head>
 <body>
-    <div class="container" id="gate-ui">
+    <div class="bg-layer"></div>
+    <div class="container" id="app-viewport">
         <div class="glass-card">
-            <h1 id="title">AXALITH CLOUD</h1>
+            <h1 id="main-title">AXALITH CLOUD</h1>
             
             <div id="login-ui" class="btn-group">
-                <button id="google-btn">GOOGLE LOGIN</button>
-                <button id="scratch-btn">SCRATCH AUTH</button>
+                <button id="google-trigger">GOOGLE CONNECT</button>
+                <button id="scratch-trigger">SCRATCH AUTH</button>
             </div>
 
-            <div id="dash-ui" class="dashboard-ui">
-                CORE SYSTEM ACTIVE
+            <div id="dash-ui">
+                <div style="font-size: 1.2rem; margin-bottom: 20px;">
+                    <span class="sync-pulse"></span>SYSTEM SYNCHRONIZED
+                </div>
+                <div id="user-display" style="font-weight: 900; letter-spacing: 4px;">GUEST_USER</div>
             </div>
 
-            <div id="status-info">INITIALIZING...</div>
+            <div id="info-text" class="info-panel">SYSTEM READY</div>
         </div>
     </div>
 
     <script>
+        // --- Firebase Configuration ---
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
@@ -66,52 +81,76 @@
         };
         firebase.initializeApp(firebaseConfig);
 
+        const appViewport = document.getElementById('app-viewport');
+        const infoText = document.getElementById('info-text');
         const params = new URLSearchParams(window.location.search);
         const mode = params.get('mode');
 
-        const navigate = (newParams) => {
-            document.getElementById('gate-ui').classList.add('fade-out');
+        // --- 画面遷移ロジック ---
+        const transitionToDash = (newParams) => {
+            appViewport.classList.add('fade-out');
             setTimeout(() => {
                 window.location.search = new URLSearchParams(newParams).toString();
             }, 800);
         };
 
-        // --- 初期表示切り替え ---
-        if (mode) {
-            document.getElementById('login-ui').style.display = 'none';
-            document.getElementById('dash-ui').style.display = 'block';
-            document.getElementById('title').innerText = "AXALITH DASHBOARD";
-            document.getElementById('status-info').innerText = `USER: ${params.get('name') || params.get('user')}`;
-            
-            // 拡張機能へ最終認証パルスを自動送信
-            window.parent.postMessage({
-                type: 'AXALITH_AUTH_FINAL',
-                authType: mode,
-                uid: params.get('uid'),
-                name: params.get('name'),
-                user: params.get('user')
-            }, '*');
-        } else {
-            document.getElementById('status-info').innerText = "WAITING FOR AUTHENTICATION...";
-        }
+        // --- 初期ロード判定 ---
+        window.onload = () => {
+            if (mode) {
+                // ダッシュボードモードの表示切り替え
+                document.getElementById('login-ui').style.display = 'none';
+                document.getElementById('dash-ui').style.display = 'block';
+                document.getElementById('main-title').innerText = "DASHBOARD";
+                document.getElementById('user-display').innerText = (params.get('name') || params.get('user')).toUpperCase();
+                infoText.innerText = "WAITING FOR CORE HANDSHAKE...";
 
-        // --- Googleログイン ---
-        document.getElementById('google-btn').onclick = () => {
+                // 拡張機能の「HATブロック」を光らせるための最終パルスを送信
+                // このパルスを拡張機能(v3.4)が受信し、自動同期後に各ハットをキックします
+                window.parent.postMessage({
+                    type: 'AXALITH_AUTH_FINAL',
+                    authType: mode,
+                    uid: params.get('uid'),
+                    name: params.get('name'),
+                    user: params.get('user')
+                }, '*');
+            }
+        };
+
+        // --- Googleログイン実行 ---
+        document.getElementById('google-trigger').onclick = () => {
+            infoText.innerText = "ESTABLISHING GOOGLE SECURE LINK...";
             const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider).then((r) => {
-                navigate({ mode: 'GOOGLE', uid: r.user.uid, name: r.user.displayName });
+            firebase.auth().signInWithPopup(provider).then((result) => {
+                const u = result.user;
+                transitionToDash({
+                    mode: 'GOOGLE',
+                    uid: u.uid,
+                    name: u.displayName
+                });
+            }).catch(e => {
+                infoText.innerText = "CONNECTION REFUSED.";
+                console.error(e);
             });
         };
 
-        // --- Scratch Auth (パルス発信) ---
-        document.getElementById('scratch-btn').onclick = () => {
-            window.parent.postMessage({ type: 'AXALITH_PULSE', label: 'TRIGGER_SCRATCH_AUTH' }, '*');
+        // --- Scratch Auth (拡張機能へのパルス送信) ---
+        document.getElementById('scratch-trigger').onclick = () => {
+            infoText.innerText = "PULSE EMITTED: WAITING FOR CORE...";
+            // 拡張機能側の「onPulseReceived」ハットをキック
+            window.parent.postMessage({
+                type: 'AXALITH_PULSE',
+                label: 'TRIGGER_SCRATCH_AUTH'
+            }, '*');
         };
 
-        // --- 拡張機能からのScratch Auth成功通知を受信 ---
+        // --- 拡張機能からのScratch認証完了通知を待機 ---
         window.addEventListener('message', (e) => {
             if (e.data.type === 'NAVIGATE_DASHBOARD') {
-                navigate({ mode: 'SCRATCH', user: e.data.user });
+                infoText.innerText = "SCRATCH AUTH VERIFIED.";
+                transitionToDash({
+                    mode: 'SCRATCH',
+                    user: e.data.user
+                });
             }
         });
     </script>
