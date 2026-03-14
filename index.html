@@ -3,152 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axalith Cloud Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>Axalith Cloud | Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <style>
         :root {
-            --glass-bg: rgba(255, 255, 255, 0.1);
-            --glass-border: rgba(255, 255, 255, 0.2);
-            --neon-blue: #00d2ff;
-            --scratch-orange: #ffab19;
-            --text-color: #ffffff;
+            --neon-cyan: #00f2ff;
+            --neon-blue: #0072ff;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-strong: rgba(255, 255, 255, 0.12);
+            --border: rgba(255, 255, 255, 0.2);
+            --scratch-color: #ffab19;
         }
 
         body {
             margin: 0; padding: 0; height: 100vh;
             display: flex; justify-content: center; align-items: center;
-            background: radial-gradient(circle at center, #0a192f 0%, #02060c 100%);
-            font-family: 'Inter', sans-serif; color: var(--text-color); overflow: hidden;
+            background: #000;
+            /* 背景の動的な光 */
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 114, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.1) 0%, transparent 40%);
+            font-family: 'Inter', sans-serif;
+            color: white;
+            overflow: hidden;
         }
 
-        .crystal-panel {
-            background: var(--glass-bg); backdrop-filter: blur(25px) saturate(200%);
-            -webkit-backdrop-filter: blur(25px) saturate(200%);
-            border: 1px solid var(--glass-border); border-radius: 28px;
-            padding: 40px; width: 360px; text-align: center;
-            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.7);
+        /* 背景のアニメーション・クリスタル */
+        body::before {
+            content: ""; position: absolute; width: 200%; height: 200%;
+            background: repeating-linear-gradient(45deg, transparent, transparent 100px, rgba(255,255,255,0.01) 100px, rgba(255,255,255,0.01) 200px);
+            animation: move 60s linear infinite; z-index: -1;
+        }
+        @keyframes move { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+        .container {
+            position: relative;
+            width: 380px;
+            padding: 50px 40px;
+            background: var(--glass);
+            backdrop-filter: blur(40px) saturate(200%);
+            -webkit-backdrop-filter: blur(40px) saturate(200%);
+            border: 1px solid var(--border);
+            border-radius: 40px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.05);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .logo-container img {
-            width: 130px; height: auto; margin-bottom: 25px;
-            filter: drop-shadow(0 0 15px var(--neon-blue));
+        .logo-area img {
+            width: 140px; height: auto;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 0 15px var(--neon-cyan));
+            animation: pulse 3s infinite ease-in-out;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 0.8; transform: scale(1); } 50% { opacity: 1; transform: scale(1.05); } }
+
+        h1 { font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: 2px; text-transform: uppercase; }
+        .subtitle { font-size: 0.8rem; font-family: 'JetBrains Mono'; opacity: 0.5; margin-bottom: 35px; }
+
+        .profile-wrap { display: none; margin-bottom: 30px; }
+        .profile-img {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 2px solid var(--neon-cyan);
+            padding: 5px; background: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.3);
         }
 
-        h1 { font-size: 1.6rem; margin-bottom: 8px; font-weight: 700; letter-spacing: 1px; }
-        p { font-size: 0.85rem; opacity: 0.7; margin-bottom: 30px; letter-spacing: 0.5px; }
-
-        .auth-btn {
-            width: 100%; padding: 14px; margin-bottom: 15px;
-            border: none; border-radius: 14px; cursor: pointer;
-            font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        .btn {
+            position: relative; width: 100%; padding: 16px; margin-top: 15px;
+            border: none; border-radius: 16px; font-weight: 700; font-size: 0.95rem;
+            cursor: pointer; transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            overflow: hidden;
         }
 
-        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        /* Googleボタン: プレミアムホワイト */
+        .btn-google { background: #fff; color: #000; box-shadow: 0 10px 20px rgba(255,255,255,0.1); }
+        .btn-google:hover { background: #f0f0f0; transform: translateY(-3px); }
 
-        .btn-google { background: #ffffff; color: #1a1a1a; }
-        .btn-scratch { background: var(--scratch-orange); color: #fff; display: none; }
-        .btn-logout { background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.3); display: none; margin-top: 10px; }
+        /* Scratchボタン: ネオンオレンジ */
+        .btn-scratch { 
+            display: none; background: var(--scratch-color); color: white;
+            box-shadow: 0 10px 25px rgba(255, 171, 25, 0.3);
+        }
+        .btn-scratch:hover { filter: brightness(1.1); transform: translateY(-3px); }
 
-        .profile-img { width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--neon-blue); display: none; margin: 0 auto 15px; box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
+        /* ログアウト */
+        .btn-logout { 
+            display: none; background: transparent; color: #ff4d4d; 
+            border: 1px solid rgba(255, 77, 77, 0.3); margin-top: 25px;
+        }
+        .btn-logout:hover { background: rgba(255, 77, 77, 0.1); }
+
     </style>
 </head>
 <body>
 
-    <div class="crystal-panel">
-        <div class="logo-container">
-            <img src="https://raw.githubusercontent.com/AzumoAurora3032/Axalith-Cloud/main/logo.png" alt="Axalith Logo" id="app-logo">
+    <div class="container" id="panel">
+        <div class="logo-area">
+            <img src="https://raw.githubusercontent.com/AzumoAurora3032/Axalith-Cloud/main/logo.png" alt="Axalith Logo" id="logo">
         </div>
 
-        <h1 id="display-name">AXALITH CLOUD</h1>
-        <p id="display-status">Next-Gen Digital Infrastructure</p>
+        <div class="profile-wrap" id="profile-wrap">
+            <img src="" id="user-photo" class="profile-img">
+        </div>
 
-        <img src="" id="user-photo" class="profile-img">
-        
-        <button class="auth-btn btn-google" id="google-login">
+        <h1 id="main-title">AXALITH CLOUD</h1>
+        <p class="subtitle" id="sub-title">CRYSTAL_NETWORK_OS_v1.0</p>
+
+        <button class="btn btn-google" id="google-login">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
-            Googleで接続
+            CONNECT TO CLOUD
         </button>
 
-        <button class="auth-btn btn-scratch" id="scratch-auth">
-            Scratchアカウントを連携
+        <button class="btn btn-scratch" id="scratch-auth">
+            SCRATCH AUTH LINK
         </button>
-        
-        <button class="auth-btn btn-logout" id="logout-btn">ログアウト</button>
+
+        <button class="btn btn-logout" id="logout-btn">DISCONNECT</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.min.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.min.js";
 
-        // 代表から提供いただいた最強のConfig
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
             projectId: "axalith-cloud",
             storageBucket: "axalith-cloud.firebasestorage.app",
             messagingSenderId: "938510930021",
-            appId: "1:938510930021:web:6037bbedd87519f55db68c",
-            measurementId: "G-76RMP31JB7"
+            appId: "1:938510930021:web:6037bbedd87519f55db68c"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
+        // DOM取得
         const googleBtn = document.getElementById('google-login');
         const scratchBtn = document.getElementById('scratch-auth');
         const logoutBtn = document.getElementById('logout-btn');
+        const profileWrap = document.getElementById('profile-wrap');
         const userPhoto = document.getElementById('user-photo');
-        const displayName = document.getElementById('display-name');
-        const displayStatus = document.getElementById('display-status');
+        const mainTitle = document.getElementById('main-title');
+        const subTitle = document.getElementById('sub-title');
 
-        // --- Googleログイン ---
-        googleBtn.addEventListener('click', async () => {
-            try {
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                console.error("Auth Error:", error);
-                alert("接続に失敗しました。コンソールを確認してください。");
-            }
+        // --- Googleログイン (確実に反応させるためのクリック登録) ---
+        window.addEventListener('DOMContentLoaded', () => {
+            googleBtn.onclick = async () => {
+                console.log("Accessing Axalith Core...");
+                try {
+                    await signInWithPopup(auth, provider);
+                } catch (e) {
+                    console.error(e);
+                    alert("AUTH_ERROR: " + e.message);
+                }
+            };
         });
 
-        // --- 状態監視 ---
+        // --- 状態監視とUI遷移 ---
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                googleBtn.style.display = 'none';
-                scratchBtn.style.display = 'flex';
-                logoutBtn.style.display = 'flex';
-                userPhoto.style.display = 'block';
+                googleBtn.style.display = "none";
+                profileWrap.style.display = "block";
+                scratchBtn.style.display = "flex";
+                logoutBtn.style.display = "flex";
+                
                 userPhoto.src = user.photoURL;
-                displayName.innerText = user.displayName;
-                displayStatus.innerText = "Authorized Representative";
+                mainTitle.innerText = user.displayName.toUpperCase();
+                subTitle.innerText = "AUTHORIZED_REPRESENTATIVE";
+                subTitle.style.color = "var(--neon-cyan)";
             } else {
-                googleBtn.style.display = 'flex';
-                scratchBtn.style.display = 'none';
-                logoutBtn.style.display = 'none';
-                userPhoto.style.display = 'none';
-                displayName.innerText = "AXALITH CLOUD";
-                displayStatus.innerText = "Next-Gen Digital Infrastructure";
+                googleBtn.style.display = "flex";
+                profileWrap.style.display = "none";
+                scratchBtn.style.display = "none";
+                logoutBtn.style.display = "none";
+                
+                mainTitle.innerText = "AXALITH CLOUD";
+                subTitle.innerText = "CRYSTAL_NETWORK_OS_v1.0";
+                subTitle.style.color = "rgba(255,255,255,0.5)";
             }
         });
 
         // --- Scratch Auth ---
         scratchBtn.onclick = () => {
-            const redirectUrl = btoa(window.location.href.split('?')[0]);
-            window.location.href = `https://auth.itinerary.is/auth/?redirect=${redirectUrl}`;
+            const redirect = btoa(window.location.href.split('?')[0]);
+            window.location.href = `https://auth.itinerary.is/auth/?redirect=${redirect}`;
         };
-
-        // --- URLパラメータ（Scratch Auth戻り） ---
-        const urlParams = new URLSearchParams(window.location.search);
-        const privateCode = urlParams.get('privateCode');
-        if (privateCode) {
-            window.history.replaceState({}, document.title, window.location.pathname);
-            alert("Scratch連携コードを承認しました。\nCode: " + privateCode);
-        }
 
         // --- ログアウト ---
         logoutBtn.onclick = () => signOut(auth);
+
+        // --- Scratch戻り処理 ---
+        const code = new URLSearchParams(window.location.search).get('privateCode');
+        if (code) {
+            alert("SYSTEM: Scratch Auth Code [" + code + "] Received.");
+            window.history.replaceState({}, "", window.location.pathname);
+        }
     </script>
 </body>
 </html>
