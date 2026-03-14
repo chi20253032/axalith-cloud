@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Axalith Cloud | 統合ポータル</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=JetBrains+Mono&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+    <title>Axalith Cloud | 認証ゲートウェイ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --neon-cyan: #00f2ff;
-            --neon-blue: #0072ff;
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(255, 255, 255, 0.2);
             --scratch-color: #ffab19;
@@ -18,63 +17,32 @@
             margin: 0; padding: 0; height: 100vh;
             display: flex; justify-content: center; align-items: center;
             background: #000;
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(0, 114, 255, 0.2) 0%, transparent 45%),
-                radial-gradient(circle at 90% 80%, rgba(0, 242, 255, 0.15) 0%, transparent 45%);
             font-family: 'Inter', 'Noto Sans JP', sans-serif; color: white; overflow: hidden;
         }
 
-        /* 没にしない：背後の動くクリスタル・グリッド */
-        body::before {
-            content: ""; position: absolute; width: 200%; height: 200%;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
-            transform: perspective(500px) rotateX(60deg) translateY(-20%);
-            animation: grid-move 20s linear infinite; z-index: -1;
-        }
-        @keyframes grid-move { from { transform: perspective(500px) rotateX(60deg) translateY(0); } to { transform: perspective(500px) rotateX(60deg) translateY(50px); } }
-
+        /* 豪華なクリスタルデザインを維持 */
         .container {
-            position: relative; width: 380px; padding: 60px 40px;
-            background: var(--glass); backdrop-filter: blur(50px) saturate(210%);
-            -webkit-backdrop-filter: blur(50px) saturate(210%);
-            border: 1px solid var(--border); border-radius: 40px;
-            text-align: center;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8), inset 0 0 30px rgba(255, 255, 255, 0.05);
+            width: 340px; padding: 40px;
+            background: var(--glass); backdrop-filter: blur(40px) saturate(210%);
+            -webkit-backdrop-filter: blur(40px) saturate(210%);
+            border: 1px solid var(--border); border-radius: 32px;
+            text-align: center; box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
         }
 
-        .logo-area img {
-            width: 150px; height: auto; margin-bottom: 30px;
-            filter: drop-shadow(0 0 20px var(--neon-cyan));
-            animation: float 4s infinite ease-in-out;
-        }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-
-        h1 { font-size: 1.8rem; font-weight: 700; margin: 0; letter-spacing: 2px; }
-        .subtitle { font-size: 0.75rem; font-family: 'JetBrains Mono'; opacity: 0.5; margin-bottom: 40px; }
-
-        .profile-wrap { display: none; margin-bottom: 30px; }
-        .profile-img {
-            width: 90px; height: 90px; border-radius: 50%;
-            border: 2px solid var(--neon-cyan); padding: 5px; background: rgba(0, 242, 255, 0.1);
-            box-shadow: 0 0 40px rgba(0, 242, 255, 0.4);
-        }
+        .logo-area img { width: 120px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 0 15px var(--neon-cyan)); }
+        h1 { font-size: 1.4rem; font-weight: 700; margin: 0; }
+        .subtitle { font-size: 0.7rem; opacity: 0.5; margin-bottom: 30px; letter-spacing: 1px; }
 
         .btn {
-            width: 100%; padding: 18px; margin-top: 15px; border: none; border-radius: 20px;
-            font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.4s;
-            display: flex; align-items: center; justify-content: center; gap: 12px;
+            width: 100%; padding: 16px; margin-top: 15px; border: none; border-radius: 16px;
+            font-weight: 700; cursor: pointer; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
 
         .btn-google { background: #fff; color: #000; }
-        .btn-google:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(255,255,255,0.2); }
-
         .btn-scratch { display: none; background: var(--scratch-color); color: white; }
-        .btn-scratch:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(255, 171, 25, 0.4); }
-
-        .btn-logout { display: none; background: transparent; color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.4); margin-top: 30px; font-size: 0.8rem; }
+        
+        #status-msg { margin-top: 15px; font-size: 0.8rem; color: var(--neon-cyan); display: none; }
     </style>
 </head>
 <body>
@@ -84,25 +52,22 @@
             <img src="https://raw.githubusercontent.com/chi20253032/Axalith-Cloud/main/logo.png" alt="Axalith Logo" onerror="this.src='https://raw.githubusercontent.com/chi20253032/Axalith-Cloud/master/logo.png'">
         </div>
 
-        <div class="profile-wrap" id="profile-wrap">
-            <img src="" id="user-photo" class="profile-img">
-        </div>
-
         <h1 id="main-title">AXALITH CLOUD</h1>
-        <p class="subtitle" id="sub-title">次世代デジタルインフラ基盤</p>
+        <p class="subtitle" id="sub-title">AUTHENTICATION SERVER</p>
 
         <button class="btn btn-google" id="google-login">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="22">
-            Googleアカウントで接続
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+            Googleでサインイン
         </button>
 
-        <button class="btn btn-scratch" id="scratch-auth">Scratch IDを連携する</button>
-        <button class="btn btn-logout" id="logout-btn">システムを終了</button>
+        <button class="btn btn-scratch" id="scratch-auth">Scratch Authで連携</button>
+        
+        <p id="status-msg">処理中...</p>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://cdn.skypack.dev/firebase/app";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://cdn.skypack.dev/firebase/auth";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://cdn.skypack.dev/firebase/auth";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
@@ -119,54 +84,50 @@
 
         const googleBtn = document.getElementById('google-login');
         const scratchBtn = document.getElementById('scratch-auth');
-        const logoutBtn = document.getElementById('logout-btn');
-        const profileWrap = document.getElementById('profile-wrap');
-        const userPhoto = document.getElementById('user-photo');
-        const mainTitle = document.getElementById('main-title');
-        const subTitle = document.getElementById('sub-title');
+        const statusMsg = document.getElementById('status-msg');
 
+        // --- 1. Googleログイン後の自動終了 ---
         googleBtn.onclick = async () => {
-            try { await signInWithPopup(auth, provider); }
-            catch (e) { alert("認証エラーが発生しました。コンソールを確認してください。"); }
+            try {
+                await signInWithPopup(auth, provider);
+                // ログイン成功したらメッセージを出して少し待ってから閉じる（任意）
+                statusMsg.style.display = "block";
+                statusMsg.innerText = "Google認証成功。Scratch連携へ移ります...";
+            } catch (e) {
+                alert("Auth Error: " + e.message);
+            }
         };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 googleBtn.style.display = "none";
-                profileWrap.style.display = "block";
                 scratchBtn.style.display = "flex";
-                logoutBtn.style.display = "flex";
-                userPhoto.src = user.photoURL;
-                mainTitle.innerText = user.displayName;
-                subTitle.innerText = "承認済み代表者 | AUTHORIZED REPRESENTATIVE";
-                subTitle.style.color = "var(--neon-cyan)";
-            } else {
-                googleBtn.style.display = "flex";
-                profileWrap.style.display = "none";
-                scratchBtn.style.display = "none";
-                logoutBtn.style.display = "none";
-                mainTitle.innerText = "AXALITH CLOUD";
-                subTitle.innerText = "次世代デジタルインフラ基盤";
-                subTitle.style.color = "rgba(255,255,255,0.5)";
+                document.getElementById('main-title').innerText = user.displayName;
             }
         });
 
-        // 修正：DNSエラー対策を施したScratch Auth導線
+        // --- 2. Scratch Auth 連携 ---
         scratchBtn.onclick = () => {
-            const redirect = btoa(window.location.origin + window.location.pathname);
-            // itinerary.isが不安定な場合のために、一般的なScratch Authエンドポイントを使用
-            const authUrl = `https://auth.itinerary.is/auth/?redirect=${redirect}`;
-            
-            // 接続チェックを兼ねて遷移
-            window.location.href = authUrl;
+            // リダイレクト先をこのページ自身にする
+            const redirect = btoa(window.location.href.split('?')[0]);
+            window.location.href = `https://auth.itinerary.is/auth/?redirect=${redirect}`;
         };
 
-        logoutBtn.onclick = () => signOut(auth);
-
+        // --- 3. コードを取得したら PenguinMod に送ってウィンドウを閉じる ---
         const code = new URLSearchParams(window.location.search).get('privateCode');
         if (code) {
-            alert("Scratch連携コードを承認しました: " + code);
-            window.history.replaceState({}, "", window.location.pathname);
+            statusMsg.style.display = "block";
+            statusMsg.innerText = "連携完了。システムへ戻ります...";
+
+            // PenguinMod (親ウィンドウ) にコードを送信
+            if (window.opener) {
+                window.opener.postMessage({ type: 'SCRATCH_AUTH', code: code }, "*");
+            }
+
+            // 1.5秒後に自動でウィンドウを閉じる
+            setTimeout(() => {
+                window.close();
+            }, 1500);
         }
     </script>
 </body>
