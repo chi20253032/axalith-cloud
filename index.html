@@ -2,35 +2,40 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Axalith Cloud - Portal</title>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <title>Axalith Cloud - Active</title>
     <style>
-        body { background: #000; color: #00f2ff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        .card { border: 1px solid rgba(0, 242, 255, 0.4); padding: 50px; border-radius: 20px; background: rgba(0, 242, 255, 0.05); backdrop-filter: blur(20px); text-align: center; }
-        button { background: #00f2ff; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
-        button:hover { box-shadow: 0 0 20px #00f2ff; transform: scale(1.05); }
+        body { background: #000; color: #00f2ff; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .status-text { font-size: 1.5rem; letter-spacing: 5px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>AXALITH CLOUD</h1>
-        <button id="auth-btn">CONNECT SYSTEM</button>
-    </div>
-    <script>
-        firebase.initializeApp({
-            apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
-            authDomain: "axalith-cloud.firebaseapp.com",
-            projectId: "axalith-cloud"
-        });
+    <div class="status-text">SYSTEM CONNECTED</div>
 
-        document.getElementById('auth-btn').onclick = () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            firebase.auth().signInWithPopup(provider).then((result) => {
-                const u = result.user;
-                // ダッシュボードへUID等を送信
-                window.location.href = `dashboard.html?uid=${u.uid}&name=${encodeURIComponent(u.displayName)}&photo=${encodeURIComponent(u.photoURL)}&email=${encodeURIComponent(u.email)}`;
-            });
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const mode = params.get('mode');
+
+        // 自分がすでにiframe（拡張機能の枠）の中で動いているため、
+        // 「自分（window）」または「親（window.parent）」の拡張機能に向けてパルスを送信する
+        function sendPulse(data) {
+            window.parent.postMessage(data, '*');
+            window.postMessage(data, '*');
+        }
+
+        window.onload = () => {
+            if (mode === 'GOOGLE') {
+                sendPulse({
+                    type: 'AXALITH_GOOGLE_SUCCESS',
+                    value: 1,
+                    userName: params.get('name'),
+                    userPhoto: params.get('photo'),
+                    uid: params.get('uid')
+                });
+            } else if (mode === 'SCRATCH') {
+                // 拡張機能側のScratch Authハットブロックを起動させる
+                sendPulse({ type: 'AXALITH_PULSE', label: 'START_SCRATCH_AUTH' });
+            }
         };
     </script>
 </body>

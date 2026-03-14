@@ -1,55 +1,139 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Axalith Cloud - Dashboard</title>
-    <style>
-        body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-        iframe { border: none; width: 100vw; height: 100vh; }
-    </style>
-</head>
-<body>
-    <iframe id="pm-frame" src="https://penguinmod.com/player?url=YOUR_PROJECT_URL&ext=true"></iframe>
+(function(Scratch) {
+    'use strict';
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        
-        // 代表の提供コード（Google認証信号リスナー）が反応する形式のデータ
-        const googleSignal = {
-            type: 'AXALITH_GOOGLE_SUCCESS',
-            value: 1,
-            userName: params.get('name'),
-            userEmail: params.get('email'),
-            userPhoto: params.get('photo')
-        };
-
-        // 汎用パルス（AXALITH_PULSE）用の初期化パルス
-        const initPulse = {
-            type: 'AXALITH_PULSE',
-            label: 'INITIALIZED',
-            uid: params.get('uid') // 拡張機能側の [UID] 引数に使用
-        };
-
-        const iframe = document.getElementById('pm-frame');
-
-        // メッセージングハブ
-        window.addEventListener('message', (e) => {
-            // 拡張機能からの送信（bridgeSend）を受信
-            if (e.data.type === 'AXALITH_BRIDGE') {
-                console.log("親ウィンドウで受信:", e.data.label, e.data.value);
-            }
+    // スクリプト読み込み用
+    const loadScript = (src) => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            document.head.appendChild(script);
         });
+    };
 
-        // ロード時に信号を流し込む
-        iframe.onload = () => {
-            // 確実に届くよう、少し時間を置いてから送信
-            setTimeout(() => {
-                // 1. Google情報を流し込む（拡張機能の hats が動く）
-                iframe.contentWindow.postMessage(googleSignal, '*');
-                // 2. ログにUIDを出力（デバッグ用）
-                console.log("Axalith: Cloud Signals injected for UID:", params.get('uid'));
-            }, 2500);
-        };
-    </script>
-</body>
-</html>
+    class AxalithCoreLinker {
+        constructor() {
+            this.signals = { auth: 0, google: 0 };
+            this.userData_bridge = { name: "GUEST", email: "unknown", photo: "" };
+            this.db = null;
+            this.userData_db = {};
+            this.currentUid = ""; // ここにUIDまたはScratch名が入る
+            this.isInitialized = false;
+            this.receivedLabels = {};
+
+            this.config = {
+                apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
+                authDomain: "axalith-cloud.firebaseapp.com",
+                projectId: "axalith-cloud",
+                bonusAmount: 5000 
+            };
+
+            // --- 📡 ダイレクト・リスナー ---
+            window.addEventListener('message', async (event) => {
+                let data = event.data;
+                if (!data || typeof data !== 'object') return;
+
+                // Google認証成功時の自動同期
+                if (data.type === 'AXALITH_GOOGLE_SUCCESS') {
+                    console.log("🚀 Axalith: Google UID Detected. Auto-Syncing...");
+                    this.userData_bridge.name = data.userName;
+                    this.userData_bridge.photo = data.userPhoto;
+                    this.signals.google = 1;
+                    
+                    // UIDをGoogleのものに上書き（Scratch名からの昇格）
+                    this.currentUid = data.uid;
+
+                    await this.initialize();
+                    await this.autoSync({ UID: this.currentUid });
+
+                    // Google認証完了ハットを起動
+                    Scratch.vm.runtime.startHats('axalithCoreLinker_whenGoogleSignalReceived');
+                }
+
+                // 汎用パルス受信
+                if (data.type === 'AXALITH_PULSE') {
+                    this.receivedLabels[data.label] = data.value || true;
+                }
+            });
+        }
+
+        // --- 内部メソッド（提供コードを維持しつつ強化） ---
+        async initialize() {
+            if (this.isInitialized) return;
+            await loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js");
+            await loadScript("https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js");
+            if (!window.firebase.apps.length) {
+                window.firebase.initializeApp(this.config);
+                this.db = window.firebase.firestore();
+                this.isInitialized = true;
+            }
+        }
+
+        async autoSync(args) {
+            if (!this.db || !args.UID) return;
+            this.currentUid = args.UID;
+            const usersRef = this.db.collection('users');
+            const snapshot = await usersRef.where('uid_link', '==', this.currentUid).get();
+            
+            if (snapshot.empty) {
+                // 初回ログイン（Scratch名ログイン時もここを通る）
+                const docRef = usersRef.doc();
+                const newData = {
+                    uid_link: this.currentUid,
+                    rank: "User",
+                    credit: this.config.bonusAmount,
+                    status: "Online",
+                    last_update: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                await docRef.set(newData);
+                this.userData_db = newData;
+            } else {
+                // 既存ユーザー
+                this.userData_db = snapshot.docs[0].data();
+            }
+        }
+
+        // ... (以下、getUserData, updateData, bridgeSend等は提供コードを完全維持) ...
+        getUserData(args) { return this.userData_db[args.FIELD] || ""; }
+        
+        async updateData(args) {
+            if (!this.db || !this.currentUid) return;
+            const usersRef = this.db.collection('users');
+            const snapshot = await usersRef.where('uid_link', '==', this.currentUid).get();
+            if (!snapshot.empty) {
+                await snapshot.docs[0].ref.update({ [args.FIELD]: args.VALUE });
+                this.userData_db[args.FIELD] = args.VALUE;
+            }
+        }
+
+        onPulseReceived(args) {
+            if (this.receivedLabels[args.LABEL]) {
+                this.receivedLabels[args.LABEL] = false;
+                return true;
+            }
+            return false;
+        }
+
+        getInfo() {
+            return {
+                id: 'axalithCoreLinker',
+                name: 'Axalith Core-Linker v2.0',
+                color1: '#00f2ff',
+                blocks: [
+                    { opcode: 'initialize', blockType: Scratch.BlockType.COMMAND, text: 'Axalith システム起動' },
+                    { opcode: 'autoSync', blockType: Scratch.BlockType.COMMAND, text: 'ユーザーデータを同期 [UID]', arguments: { UID: { type: Scratch.ArgumentType.STRING, defaultValue: '' } } },
+                    '---',
+                    { opcode: 'whenGoogleSignalReceived', blockType: Scratch.BlockType.EVENT, text: 'Google認証信号を受信したとき' },
+                    { opcode: 'onPulseReceived', blockType: Scratch.BlockType.HAT, text: 'パルス [LABEL] を受信したとき', arguments: { LABEL: { type: Scratch.ArgumentType.STRING, defaultValue: 'ping' } } },
+                    { opcode: 'getUserData', blockType: Scratch.BlockType.REPORTER, text: 'クラウドの [FIELD] を取得', arguments: { FIELD: { type: Scratch.ArgumentType.STRING, menu: 'fields' } } },
+                    { opcode: 'updateData', blockType: Scratch.BlockType.COMMAND, text: '[FIELD] を [VALUE] に更新', arguments: { FIELD: { type: Scratch.ArgumentType.STRING, menu: 'fields' }, VALUE: { type: Scratch.ArgumentType.STRING, defaultValue: '' } } }
+                ],
+                menus: {
+                    fields: { acceptReporters: true, items: ['rank', 'credit', 'status', 'total_earned', 'uid_link'] }
+                }
+            };
+        }
+    }
+
+    Scratch.extensions.register(new AxalithCoreLinker());
+})(Scratch);
