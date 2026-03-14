@@ -2,87 +2,182 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Axalith Cloud | Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axalith Cloud Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* --- Axalith Crystal UI --- */
         :root {
-            --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
-            --prism-edge: rgba(255, 255, 255, 0.4);
-            --neon-blue: #00d4ff;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --neon-blue: #00d2ff;
+            --scratch-orange: #ffab19;
+            --text-color: #ffffff;
         }
 
         body {
-            margin: 0; height: 100vh; display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
-            font-family: 'Inter', sans-serif; overflow: hidden; color: white;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #0a192f 0%, #02060c 100%);
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            overflow: hidden;
         }
 
+        /* クリスタルパネル（Glassmorphism） */
         .crystal-panel {
-            position: relative; width: 360px; padding: 3rem;
-            background: var(--glass-bg); backdrop-filter: blur(35px) saturate(160%);
-            border: 1px solid rgba(255,255,255,0.1); border-top: 1px solid var(--prism-edge);
-            border-radius: 28px; box-shadow: 0 50px 100px rgba(0,0,0,0.8);
-            text-align: center; animation: floating 8s infinite ease-in-out;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
         }
 
-        @keyframes floating { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .logo-container img {
+            width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 0 10px var(--neon-blue));
+        }
 
-        h1 { font-weight: 200; letter-spacing: 8px; margin-bottom: 2.5rem; }
+        h1 { font-size: 1.5rem; margin-bottom: 10px; font-weight: 700; letter-spacing: 1px; }
+        p { font-size: 0.9rem; opacity: 0.8; margin-bottom: 30px; }
 
+        /* ボタンデザイン */
         .auth-btn {
-            width: 100%; padding: 14px; margin: 10px 0;
-            border: none; border-radius: 12px; font-weight: 700;
-            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .btn-google { background: white; color: #444; }
-        .btn-google:hover { transform: scale(1.03); box-shadow: 0 0 20px rgba(0, 212, 255, 0.4); }
+        .auth-btn:active { transform: scale(0.98); }
 
-        .btn-other { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .btn-google { background: #ffffff; color: #000; }
+        .btn-scratch { background: var(--scratch-orange); color: #fff; }
+        .btn-logout { background: rgba(255, 0, 0, 0.2); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); margin-top: 10px; }
+
+        #user-info { display: none; }
+        .profile-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--neon-blue); margin-bottom: 10px; }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: rgba(0, 210, 255, 0.2);
+            color: var(--neon-blue);
+            font-size: 0.75rem;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
 
     <div class="crystal-panel">
-        <h1>AXALITH</h1>
-        
-        <button class="auth-btn btn-google" id="google-login">
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18"> Googleで接続
-        </button>
+        <div class="logo-container">
+            <img src="https://raw.githubusercontent.com/AzumoAurora3032/Axalith-Cloud/main/logo.png" alt="Axalith Logo" id="app-logo">
+        </div>
 
-        <button class="auth-btn btn-other" id="scratch-btn">Scratch Auth (Coming Soon)</button>
-        <button class="auth-btn btn-other" id="pm-btn">PenguinMod ID (Coming Soon)</button>
+        <div id="login-ui">
+            <h1>AXALITH CLOUD</h1>
+            <p>Next-Gen Digital Infrastructure</p>
+            <button class="auth-btn btn-google" id="google-login">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
+                Googleで接続
+            </button>
+        </div>
+
+        <div id="user-info">
+            <img src="" id="user-photo" class="profile-img">
+            <h1 id="user-name">Welcome</h1>
+            <div class="status-badge">AUTHENTICATED</div>
+            
+            <button class="auth-btn btn-scratch" id="scratch-auth">
+                Scratchアカウントを連携
+            </button>
+            
+            <button class="auth-btn btn-logout" id="logout-btn">ログアウト</button>
+        </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.min.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.min.js";
 
-        // 代表の最新Config
+        // 代表のFirebase設定
         const firebaseConfig = {
-            apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
+            apiKey: "AIzaSyD...", // ここを自分のキーに
             authDomain: "axalith-cloud.firebaseapp.com",
             projectId: "axalith-cloud",
-            storageBucket: "axalith-cloud.firebasestorage.app",
-            messagingSenderId: "938510930021",
-            appId: "1:938510930021:web:6037bbedd87519f55db68c",
-            measurementId: "G-76RMP31JB7"
+            storageBucket: "axalith-cloud.appspot.com",
+            messagingSenderId: "1090333796500",
+            appId: "1:1090333796500:web:9f8e4e757d59451121d556"
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth();
-        const googleProvider = new GoogleAuthProvider();
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
 
+        const loginUi = document.getElementById('login-ui');
+        const userInfo = document.getElementById('user-info');
+
+        // --- 1. Googleログイン処理 ---
         document.getElementById('google-login').onclick = async () => {
             try {
-                const result = await signInWithPopup(auth, googleProvider);
-                alert(`${result.user.displayName}様、Axalith Cloudへようこそ！`);
-                console.log("認証成功:", result.user);
+                await signInWithPopup(auth, provider);
             } catch (error) {
-                console.error("エラー詳細:", error);
-                alert("ログインに失敗しました: " + error.message);
+                console.error("Login Error:", error);
+                alert("ログイン失敗: " + error.message);
             }
         };
+
+        // --- 2. ログイン状態の監視 ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loginUi.style.display = 'none';
+                userInfo.style.display = 'block';
+                document.getElementById('user-name').innerText = user.displayName + " 様";
+                document.getElementById('user-photo').src = user.photoURL;
+            } else {
+                loginUi.style.display = 'block';
+                userInfo.style.display = 'none';
+            }
+        });
+
+        // --- 3. Scratch Auth 連携処理 ---
+        document.getElementById('scratch-auth').onclick = () => {
+            // 現在のURLをリダイレクト先として設定
+            const redirectUrl = btoa(window.location.origin + window.location.pathname);
+            window.location.href = `https://auth.itinerary.is/auth/?redirect=${redirectUrl}`;
+        };
+
+        // --- 4. Scratch Authから戻ってきた時の処理 ---
+        const urlParams = new URLSearchParams(window.location.search);
+        const privateCode = urlParams.get('privateCode');
+        if (privateCode) {
+            // URLからコードを消して見た目を綺麗にする
+            window.history.replaceState({}, document.title, window.location.pathname);
+            alert("Scratch連携コードを検知しました: " + privateCode + "\nこれを使用してユーザー名を特定します。");
+        }
+
+        // --- 5. ログアウト ---
+        document.getElementById('logout-btn').onclick = () => signOut(auth);
+
     </script>
 </body>
 </html>
