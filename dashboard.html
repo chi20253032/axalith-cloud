@@ -2,33 +2,53 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>Axalith OS Desktop</title>
+    <title>Axalith Cloud - Dashboard</title>
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
         iframe { border: none; width: 100vw; height: 100vh; }
     </style>
 </head>
 <body>
-    <iframe id="pm-iframe" src="https://penguinmod.com/player?url=YOUR_PROJECT_URL_HERE&ext=true"></iframe>
+    <iframe id="pm-frame" src="https://penguinmod.com/player?url=YOUR_PROJECT_URL&ext=true"></iframe>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const userData = {
+        const params = new URLSearchParams(window.location.search);
+        
+        // 代表の提供コード（Google認証信号リスナー）が反応する形式のデータ
+        const googleSignal = {
             type: 'AXALITH_GOOGLE_SUCCESS',
             value: 1,
-            uid: urlParams.get('uid'),
-            userName: urlParams.get('name'),
-            userPhoto: urlParams.get('photo'),
-            isLinked: urlParams.get('linked') === 'true'
+            userName: params.get('name'),
+            userEmail: params.get('email'),
+            userPhoto: params.get('photo')
         };
 
-        const iframe = document.getElementById('pm-iframe');
+        // 汎用パルス（AXALITH_PULSE）用の初期化パルス
+        const initPulse = {
+            type: 'AXALITH_PULSE',
+            label: 'INITIALIZED',
+            uid: params.get('uid') // 拡張機能側の [UID] 引数に使用
+        };
+
+        const iframe = document.getElementById('pm-frame');
+
+        // メッセージングハブ
+        window.addEventListener('message', (e) => {
+            // 拡張機能からの送信（bridgeSend）を受信
+            if (e.data.type === 'AXALITH_BRIDGE') {
+                console.log("親ウィンドウで受信:", e.data.label, e.data.value);
+            }
+        });
+
+        // ロード時に信号を流し込む
         iframe.onload = () => {
-            // PenguinMod側へ認証情報をパルスとして送信
+            // 確実に届くよう、少し時間を置いてから送信
             setTimeout(() => {
-                iframe.contentWindow.postMessage(userData, '*');
-                console.log("Axalith: Sent credentials to PenguinMod.");
-            }, 2000); // 起動待ち
+                // 1. Google情報を流し込む（拡張機能の hats が動く）
+                iframe.contentWindow.postMessage(googleSignal, '*');
+                // 2. ログにUIDを出力（デバッグ用）
+                console.log("Axalith: Cloud Signals injected for UID:", params.get('uid'));
+            }, 2500);
         };
     </script>
 </body>
