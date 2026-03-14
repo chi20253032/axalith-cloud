@@ -15,75 +15,42 @@
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            margin: 0; padding: 0; height: 100vh;
+            display: flex; justify-content: center; align-items: center;
             background: radial-gradient(circle at center, #0a192f 0%, #02060c 100%);
-            font-family: 'Inter', sans-serif;
-            color: var(--text-color);
-            overflow: hidden;
+            font-family: 'Inter', sans-serif; color: var(--text-color); overflow: hidden;
         }
 
-        /* クリスタルパネル（Glassmorphism） */
         .crystal-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 40px;
-            width: 350px;
-            text-align: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            background: var(--glass-bg); backdrop-filter: blur(25px) saturate(200%);
+            -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border: 1px solid var(--glass-border); border-radius: 28px;
+            padding: 40px; width: 360px; text-align: center;
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.7);
         }
 
         .logo-container img {
-            width: 120px;
-            height: auto;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 0 10px var(--neon-blue));
+            width: 130px; height: auto; margin-bottom: 25px;
+            filter: drop-shadow(0 0 15px var(--neon-blue));
         }
 
-        h1 { font-size: 1.5rem; margin-bottom: 10px; font-weight: 700; letter-spacing: 1px; }
-        p { font-size: 0.9rem; opacity: 0.8; margin-bottom: 30px; }
+        h1 { font-size: 1.6rem; margin-bottom: 8px; font-weight: 700; letter-spacing: 1px; }
+        p { font-size: 0.85rem; opacity: 0.7; margin-bottom: 30px; letter-spacing: 0.5px; }
 
-        /* ボタンデザイン */
         .auth-btn {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            width: 100%; padding: 14px; margin-bottom: 15px;
+            border: none; border-radius: 14px; cursor: pointer;
+            font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .auth-btn:active { transform: scale(0.98); }
+        .auth-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        .btn-google { background: #ffffff; color: #000; }
-        .btn-scratch { background: var(--scratch-orange); color: #fff; }
-        .btn-logout { background: rgba(255, 0, 0, 0.2); color: #ff4d4d; border: 1px solid rgba(255, 0, 0, 0.3); margin-top: 10px; }
+        .btn-google { background: #ffffff; color: #1a1a1a; }
+        .btn-scratch { background: var(--scratch-orange); color: #fff; display: none; }
+        .btn-logout { background: rgba(255, 77, 77, 0.15); color: #ff4d4d; border: 1px solid rgba(255, 77, 77, 0.3); display: none; margin-top: 10px; }
 
-        #user-info { display: none; }
-        .profile-img { width: 60px; height: 60px; border-radius: 50%; border: 2px solid var(--neon-blue); margin-bottom: 10px; }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            background: rgba(0, 210, 255, 0.2);
-            color: var(--neon-blue);
-            font-size: 0.75rem;
-            margin-bottom: 20px;
-        }
+        .profile-img { width: 70px; height: 70px; border-radius: 50%; border: 3px solid var(--neon-blue); display: none; margin: 0 auto 15px; box-shadow: 0 0 20px rgba(0, 210, 255, 0.4); }
     </style>
 </head>
 <body>
@@ -93,91 +60,95 @@
             <img src="https://raw.githubusercontent.com/AzumoAurora3032/Axalith-Cloud/main/logo.png" alt="Axalith Logo" id="app-logo">
         </div>
 
-        <div id="login-ui">
-            <h1>AXALITH CLOUD</h1>
-            <p>Next-Gen Digital Infrastructure</p>
-            <button class="auth-btn btn-google" id="google-login">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18">
-                Googleで接続
-            </button>
-        </div>
+        <h1 id="display-name">AXALITH CLOUD</h1>
+        <p id="display-status">Next-Gen Digital Infrastructure</p>
 
-        <div id="user-info">
-            <img src="" id="user-photo" class="profile-img">
-            <h1 id="user-name">Welcome</h1>
-            <div class="status-badge">AUTHENTICATED</div>
-            
-            <button class="auth-btn btn-scratch" id="scratch-auth">
-                Scratchアカウントを連携
-            </button>
-            
-            <button class="auth-btn btn-logout" id="logout-btn">ログアウト</button>
-        </div>
+        <img src="" id="user-photo" class="profile-img">
+        
+        <button class="auth-btn btn-google" id="google-login">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="20">
+            Googleで接続
+        </button>
+
+        <button class="auth-btn btn-scratch" id="scratch-auth">
+            Scratchアカウントを連携
+        </button>
+        
+        <button class="auth-btn btn-logout" id="logout-btn">ログアウト</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.min.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.min.js";
 
-        // 代表のFirebase設定
+        // 代表から提供いただいた最強のConfig
         const firebaseConfig = {
-            apiKey: "AIzaSyD...", // ここを自分のキーに
+            apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
             projectId: "axalith-cloud",
-            storageBucket: "axalith-cloud.appspot.com",
-            messagingSenderId: "1090333796500",
-            appId: "1:1090333796500:web:9f8e4e757d59451121d556"
+            storageBucket: "axalith-cloud.firebasestorage.app",
+            messagingSenderId: "938510930021",
+            appId: "1:938510930021:web:6037bbedd87519f55db68c",
+            measurementId: "G-76RMP31JB7"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        const loginUi = document.getElementById('login-ui');
-        const userInfo = document.getElementById('user-info');
+        const googleBtn = document.getElementById('google-login');
+        const scratchBtn = document.getElementById('scratch-auth');
+        const logoutBtn = document.getElementById('logout-btn');
+        const userPhoto = document.getElementById('user-photo');
+        const displayName = document.getElementById('display-name');
+        const displayStatus = document.getElementById('display-status');
 
-        // --- 1. Googleログイン処理 ---
-        document.getElementById('google-login').onclick = async () => {
+        // --- Googleログイン ---
+        googleBtn.addEventListener('click', async () => {
             try {
                 await signInWithPopup(auth, provider);
             } catch (error) {
-                console.error("Login Error:", error);
-                alert("ログイン失敗: " + error.message);
-            }
-        };
-
-        // --- 2. ログイン状態の監視 ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                loginUi.style.display = 'none';
-                userInfo.style.display = 'block';
-                document.getElementById('user-name').innerText = user.displayName + " 様";
-                document.getElementById('user-photo').src = user.photoURL;
-            } else {
-                loginUi.style.display = 'block';
-                userInfo.style.display = 'none';
+                console.error("Auth Error:", error);
+                alert("接続に失敗しました。コンソールを確認してください。");
             }
         });
 
-        // --- 3. Scratch Auth 連携処理 ---
-        document.getElementById('scratch-auth').onclick = () => {
-            // 現在のURLをリダイレクト先として設定
-            const redirectUrl = btoa(window.location.origin + window.location.pathname);
+        // --- 状態監視 ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                googleBtn.style.display = 'none';
+                scratchBtn.style.display = 'flex';
+                logoutBtn.style.display = 'flex';
+                userPhoto.style.display = 'block';
+                userPhoto.src = user.photoURL;
+                displayName.innerText = user.displayName;
+                displayStatus.innerText = "Authorized Representative";
+            } else {
+                googleBtn.style.display = 'flex';
+                scratchBtn.style.display = 'none';
+                logoutBtn.style.display = 'none';
+                userPhoto.style.display = 'none';
+                displayName.innerText = "AXALITH CLOUD";
+                displayStatus.innerText = "Next-Gen Digital Infrastructure";
+            }
+        });
+
+        // --- Scratch Auth ---
+        scratchBtn.onclick = () => {
+            const redirectUrl = btoa(window.location.href.split('?')[0]);
             window.location.href = `https://auth.itinerary.is/auth/?redirect=${redirectUrl}`;
         };
 
-        // --- 4. Scratch Authから戻ってきた時の処理 ---
+        // --- URLパラメータ（Scratch Auth戻り） ---
         const urlParams = new URLSearchParams(window.location.search);
         const privateCode = urlParams.get('privateCode');
         if (privateCode) {
-            // URLからコードを消して見た目を綺麗にする
             window.history.replaceState({}, document.title, window.location.pathname);
-            alert("Scratch連携コードを検知しました: " + privateCode + "\nこれを使用してユーザー名を特定します。");
+            alert("Scratch連携コードを承認しました。\nCode: " + privateCode);
         }
 
-        // --- 5. ログアウト ---
-        document.getElementById('logout-btn').onclick = () => signOut(auth);
-
+        // --- ログアウト ---
+        logoutBtn.onclick = () => signOut(auth);
     </script>
 </body>
 </html>
