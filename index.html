@@ -16,97 +16,98 @@
             width: 100vw;
             height: 100vh;
             color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Liquid Glass アニメーション背景 */
+        /* Liquid Glass 背景 */
         .glass-bg {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             z-index: -1;
             background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 100%);
         }
 
         .blob {
             position: absolute;
-            width: 500px;
-            height: 500px;
-            background: linear-gradient(135deg, rgba(0, 242, 255, 0.15) 0%, rgba(0, 102, 255, 0.15) 100%);
-            filter: blur(80px);
+            width: 60vw;
+            height: 60vw;
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.1) 0%, rgba(0, 102, 255, 0.1) 100%);
+            filter: blur(100px);
             border-radius: 50%;
-            animation: move 20s infinite alternate;
+            animation: move 15s infinite alternate;
         }
 
         @keyframes move {
-            from { transform: translate(-10%, -10%) scale(1); }
-            to { transform: translate(20%, 20%) scale(1.2); }
+            from { transform: translate(-10%, -10%); }
+            to { transform: translate(10%, 10%); }
         }
 
         .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 400px;
+            z-index: 10;
         }
 
         .btn-expressive {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer !important; /* ボタンが表示されない問題を回避 */
         }
 
-        .btn-expressive:hover {
-            transform: scale(1.05) translateY(-2px);
-            box-shadow: 0 0 30px rgba(0, 242, 255, 0.4);
+        .btn-expressive:active {
+            transform: scale(0.95);
         }
 
-        /* フェードアウト用アニメーション */
         .fade-out {
             opacity: 0;
-            transform: scale(1.1);
-            transition: all 0.8s ease-in-out;
+            transform: scale(1.05);
+            pointer-events: none;
+            transition: all 0.6s ease-in-out;
         }
     </style>
 </head>
-<body class="flex items-center justify-center">
+<body>
 
     <div class="glass-bg">
-        <div class="blob" style="top: -10%; left: -10%;"></div>
-        <div class="blob" style="bottom: -10%; right: -10%; animation-delay: -5s; background: linear-gradient(135deg, rgba(255, 0, 255, 0.1) 0%, rgba(0, 102, 255, 0.1) 100%);"></div>
+        <div class="blob" style="top: -20%; left: -20%;"></div>
+        <div class="blob" style="bottom: -20%; right: -20%; animation-delay: -7s; background: rgba(0, 102, 255, 0.05);"></div>
     </div>
 
-    <div id="app-container" class="w-full h-full flex flex-col items-center justify-center p-6 text-center">
-        
-        <div class="mb-10 relative">
-            <div class="absolute inset-0 bg-cyan-500/20 blur-3xl rounded-full"></div>
-            <img src="./logo.png" alt="Axalith" class="relative w-48 h-auto drop-shadow-[0_0_25px_rgba(0,242,255,0.6)] animate-pulse"
+    <div id="app-container" class="flex flex-col items-center">
+        <div class="mb-8 relative">
+            <img src="./logo.png" alt="Axalith" class="w-40 h-auto drop-shadow-[0_0_20px_rgba(0,242,255,0.5)]"
                  onerror="this.src='https://raw.githubusercontent.com/chi20253032/Axalith-Cloud/main/logo.png'">
         </div>
 
-        <div class="glass-panel p-10 rounded-[40px] max-w-md w-full border-t border-white/20">
-            <h1 class="text-4xl font-extrabold mb-2 tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400">
-                Axalith Cloud
-            </h1>
-            <p class="text-cyan-400/80 text-sm font-light mb-8 tracking-[0.2em] uppercase">Gateway System v2.0</p>
+        <div class="glass-panel p-8 rounded-[32px] text-center">
+            <h1 class="text-3xl font-bold mb-1 tracking-tight">Axalith Cloud</h1>
+            <p class="text-cyan-400/60 text-[10px] tracking-[0.3em] uppercase mb-8">Secure Gateway</p>
 
-            <button id="google-login" class="btn-expressive w-full bg-white text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-4 hover:bg-cyan-50">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/action/google.svg" class="w-6 h-6" alt="Google">
+            <button id="google-login" class="btn-expressive w-full bg-white text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:bg-gray-100 mb-4">
+                <svg width="20" height="20" viewBox="0 0 24 24">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                </svg>
                 <span>Googleでログイン</span>
             </button>
 
-            <div class="mt-8 pt-6 border-t border-white/5 text-[10px] text-gray-500 uppercase tracking-widest">
-                Protected by Axalith Security
-            </div>
+            <div id="status" class="text-[10px] text-gray-500 font-mono mt-4">READY_TO_START</div>
         </div>
-
-        <div id="status" class="mt-6 text-sm text-cyan-500/50 font-mono">SYSTEM: READY_TO_LINK</div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
+        // 代表のConfigをそのまま維持
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
@@ -124,15 +125,14 @@
         const statusText = document.getElementById('status');
         const container = document.getElementById('app-container');
 
+        // ログイン処理
         loginBtn.addEventListener('click', async () => {
-            statusText.innerText = "SYSTEM: AUTHENTICATING...";
+            statusText.innerText = "AUTHENTICATING...";
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
-                statusText.innerText = "SYSTEM: SUCCESS - SENDING DATA";
-                
-                // PenguinModへデータを送信
+                // 【修正】パルス信号（postMessage）をより確実に送信
                 const messageData = {
                     type: "AXALITH_GOOGLE_SUCCESS",
                     userName: user.displayName,
@@ -141,19 +141,19 @@
                     uid: user.uid
                 };
                 
+                // 親ウィンドウ (PenguinMod) へ通知
                 window.parent.postMessage(messageData, "*");
-
-                // 演出: フェードアウトしてから閉じる
+                
+                statusText.innerText = "LINK_SUCCESSFUL";
                 container.classList.add('fade-out');
-                setTimeout(() => {
-                    // 自動で閉じない場合はPenguinMod側でiframeを非表示にすることを推奨
-                    console.log("Login complete, data sent.");
-                }, 800);
+
+                // 完了通知をコンソールにも出す
+                console.log("Axalith Pulse Sent:", messageData);
 
             } catch (error) {
-                console.error(error);
-                statusText.innerText = "SYSTEM: ERROR - " + error.code;
-                alert("ログインエラーが発生しました。");
+                console.error("Auth Error:", error);
+                statusText.innerText = "ERROR: " + error.code;
+                alert("ログインに失敗しました: " + error.message);
             }
         });
     </script>
