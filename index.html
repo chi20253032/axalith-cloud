@@ -76,22 +76,30 @@
         const statusEl = document.getElementById('status');
         const panel = document.getElementById('panel');
 
-        // パルス信号を親（拡張機能）へ送信
+        // ★パルス送信機能の完全強化版
         const sendPulse = (payload) => {
-            if (window.parent) {
+            console.log("Axalith: Attempting to send pulse...", payload);
+            
+            // 1. iframeとして開かれている場合（親フレームへ送信）
+            if (window.parent && window.parent !== window) {
                 window.parent.postMessage(payload, "*");
-                console.log("Pulse Sent:", payload);
+                console.log("-> Pulse sent to Parent (iframe target)");
+            }
+            
+            // 2. ポップアップや別タブとして開かれている場合（呼び出し元へ送信）
+            if (window.opener && window.opener !== window) {
+                window.opener.postMessage(payload, "*");
+                console.log("-> Pulse sent to Opener (popup target)");
             }
         };
 
-        // Google 認証
         document.getElementById('google-btn').onclick = async () => {
             statusEl.innerText = "AUTHENTICATING...";
             try {
                 const res = await signInWithPopup(auth, provider);
                 sendPulse({
                     type: "AXALITH_GOOGLE_SUCCESS",
-                    value: 1, // ここが重要：拡張機能側のトリガー条件
+                    value: 1,
                     userName: res.user.displayName,
                     userEmail: res.user.email,
                     userPhoto: res.user.photoURL
@@ -103,10 +111,8 @@
             }
         };
 
-        // Scratch Auth
         document.getElementById('scratch-btn').onclick = () => {
             statusEl.innerText = "SCRATCH_SYNCING...";
-            // Scratch Authの信号を送信
             sendPulse({ type: "AXALITH_AUTH_SIGNAL", value: 1 });
             
             setTimeout(() => {
