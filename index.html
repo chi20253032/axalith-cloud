@@ -5,101 +5,141 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Axalith Cloud Gateway</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;700&family=Outfit:wght@300;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
-            background-color: #050505;
+        /* CSS変数の定義 */
+        :root {
+            --accent: #00f2ff;
+            --bg-dark: #050505;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
             margin: 0;
             padding: 0;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-dark);
             color: white;
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Liquid Glass 背景 */
+        /* 液体ガラス・背景アニメーション */
         .glass-bg {
             position: fixed;
             inset: 0;
             z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #0a0a0a 0%, #000 100%);
+            background: radial-gradient(circle at 50% 50%, #0d0d0d 0%, #000 100%);
         }
 
         .blob {
             position: absolute;
-            width: 60vw;
-            height: 60vw;
-            background: linear-gradient(135deg, rgba(0, 242, 255, 0.1) 0%, rgba(0, 102, 255, 0.1) 100%);
-            filter: blur(100px);
+            width: 80vw;
+            height: 80vw;
+            background: linear-gradient(135deg, rgba(0, 242, 255, 0.08) 0%, rgba(0, 81, 255, 0.08) 100%);
+            filter: blur(80px);
             border-radius: 50%;
-            animation: move 15s infinite alternate;
+            animation: float 20s infinite alternate;
         }
 
-        @keyframes move {
-            from { transform: translate(-10%, -10%); }
-            to { transform: translate(10%, 10%); }
+        @keyframes float {
+            0% { transform: translate(-15%, -15%) rotate(0deg); }
+            100% { transform: translate(15%, 15%) rotate(360deg); }
         }
 
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-            width: 90%;
-            max-width: 400px;
-            z-index: 10;
+        /* パネルデザイン */
+        .main-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            width: 85%;
+            max-width: 380px;
+            padding: 2.5rem;
+            border-radius: 40px;
+            text-align: center;
+            z-index: 100;
         }
 
-        .btn-expressive {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer !important; /* ボタンが表示されない問題を回避 */
+        /* ボタン・インタラクション */
+        .btn-google {
+            background-color: white;
+            color: black;
+            font-weight: 700;
+            padding: 1rem 1.5rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+            border: none;
+            outline: none;
         }
 
-        .btn-expressive:active {
-            transform: scale(0.95);
+        .btn-google:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.3);
+            background-color: #f8f9fa;
+        }
+
+        .btn-google:active {
+            transform: scale(0.97);
+        }
+
+        /* ロゴのグロー効果 */
+        .logo-glow {
+            filter: drop-shadow(0 0 15px rgba(0, 242, 255, 0.4));
         }
 
         .fade-out {
             opacity: 0;
             transform: scale(1.05);
-            pointer-events: none;
             transition: all 0.6s ease-in-out;
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
     <div class="glass-bg">
-        <div class="blob" style="top: -20%; left: -20%;"></div>
-        <div class="blob" style="bottom: -20%; right: -20%; animation-delay: -7s; background: rgba(0, 102, 255, 0.05);"></div>
+        <div class="blob" style="top: -10%; left: -10%;"></div>
+        <div class="blob" style="bottom: -10%; right: -10%; animation-delay: -5s; background: rgba(0, 102, 255, 0.05);"></div>
     </div>
 
-    <div id="app-container" class="flex flex-col items-center">
-        <div class="mb-8 relative">
-            <img src="./logo.png" alt="Axalith" class="w-40 h-auto drop-shadow-[0_0_20px_rgba(0,242,255,0.5)]"
+    <div id="app-container" class="main-panel">
+        <div class="mb-8">
+            <img src="./logo.png" alt="Axalith" class="w-32 h-auto mx-auto logo-glow" 
                  onerror="this.src='https://raw.githubusercontent.com/chi20253032/Axalith-Cloud/main/logo.png'">
         </div>
 
-        <div class="glass-panel p-8 rounded-[32px] text-center">
-            <h1 class="text-3xl font-bold mb-1 tracking-tight">Axalith Cloud</h1>
-            <p class="text-cyan-400/60 text-[10px] tracking-[0.3em] uppercase mb-8">Secure Gateway</p>
+        <h1 class="text-3xl font-black mb-1 tracking-tighter">Axalith Cloud</h1>
+        <p class="text-cyan-400/60 text-[10px] tracking-[0.4em] uppercase mb-10">Central Gateway</p>
 
-            <button id="google-login" class="btn-expressive w-full bg-white text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:bg-gray-100 mb-4">
-                <svg width="20" height="20" viewBox="0 0 24 24">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-                </svg>
-                <span>Googleでログイン</span>
-            </button>
+        <button id="google-login" class="btn-google">
+            <svg width="24" height="24" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            <span>Googleでログイン</span>
+        </button>
 
-            <div id="status" class="text-[10px] text-gray-500 font-mono mt-4">READY_TO_START</div>
+        <div id="status" class="mt-8 text-[9px] text-gray-500 font-mono tracking-widest uppercase">
+            System Status: Ready
         </div>
     </div>
 
@@ -107,7 +147,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // 代表のConfigをそのまま維持
+        // 代表の認証情報をそのまま維持
         const firebaseConfig = {
             apiKey: "AIzaSyCsYEUq7FbMiLkNxN6GM6LjRWAo_VvpJ_c",
             authDomain: "axalith-cloud.firebaseapp.com",
@@ -117,6 +157,7 @@
             appId: "1:938510930021:web:6037bbedd87519f55db68c"
         };
 
+        // 初期化
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
@@ -125,15 +166,20 @@
         const statusText = document.getElementById('status');
         const container = document.getElementById('app-container');
 
-        // ログイン処理
+        // クリックイベント
         loginBtn.addEventListener('click', async () => {
+            console.log("Login sequence started...");
             statusText.innerText = "AUTHENTICATING...";
+            
             try {
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
-                // 【修正】パルス信号（postMessage）をより確実に送信
-                const messageData = {
+                console.log("Login Success:", user.displayName);
+                statusText.innerText = "LINK_SUCCESS";
+
+                // パルス信号 (postMessage) の送信
+                const pulseData = {
                     type: "AXALITH_GOOGLE_SUCCESS",
                     userName: user.displayName,
                     userEmail: user.email,
@@ -141,21 +187,25 @@
                     uid: user.uid
                 };
                 
-                // 親ウィンドウ (PenguinMod) へ通知
-                window.parent.postMessage(messageData, "*");
-                
-                statusText.innerText = "LINK_SUCCESSFUL";
+                // 親（PenguinMod）に送る
+                if (window.parent) {
+                    window.parent.postMessage(pulseData, "*");
+                }
+
+                // 視覚的フィードバック
                 container.classList.add('fade-out');
 
-                // 完了通知をコンソールにも出す
-                console.log("Axalith Pulse Sent:", messageData);
-
             } catch (error) {
-                console.error("Auth Error:", error);
+                console.error("Firebase Auth Error:", error);
                 statusText.innerText = "ERROR: " + error.code;
-                alert("ログインに失敗しました: " + error.message);
+                alert("ログインに失敗しました。もう一度お試しください。");
             }
         });
+
+        // 読み込み完了ログ
+        window.onload = () => {
+            console.log("Axalith Gateway v2.2 Initialized");
+        };
     </script>
 </body>
 </html>
