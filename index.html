@@ -5,63 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Axalith Cloud Gateway</title>
     <style>
-        /* すべてのスタイルをここに集約（外部依存ゼロ） */
-        :root {
-            --accent: #00f2ff;
-            --bg: #050505;
-            --panel: rgba(255, 255, 255, 0.05);
-        }
-
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: var(--bg); color: white;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-        }
-
-        /* 液体ガラス背景 */
-        .glass-bg {
-            position: fixed; inset: 0; z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
-        }
-        .blob {
-            position: absolute; width: 80vw; height: 80vw;
-            background: radial-gradient(circle, rgba(0, 242, 255, 0.1) 0%, transparent 70%);
-            animation: move 15s infinite alternate;
-        }
-        @keyframes move { from { transform: translate(-20%, -20%); } to { transform: translate(20%, 20%); } }
-
-        /* メインパネル */
-        .main-panel {
-            background: var(--panel);
-            backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 40px; padding: 40px; width: 85%; max-width: 360px;
-            text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            z-index: 100;
-        }
-
-        .logo { width: 120px; height: auto; margin-bottom: 20px; filter: drop-shadow(0 0 15px var(--accent)); }
-        h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: -1px; }
-        .subtitle { color: rgba(0, 242, 255, 0.6); font-size: 10px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 40px; }
-
-        /* Googleボタン（完全固定） */
-        .btn-google {
-            background: white; color: black; border: none; border-radius: 18px;
-            padding: 16px; width: 100%; font-weight: 700; font-size: 16px;
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .btn-google:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(0, 242, 255, 0.4); }
-        .btn-google:active { transform: scale(0.98); }
-
-        #status { margin-top: 25px; font-family: monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* 成功時の演出 */
-        .success-state { color: var(--accent); font-weight: bold; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        /* 外部依存ゼロ・完全統合スタイル */
+        :root { --accent: #00f2ff; --bg: #050505; --glass: rgba(255, 255, 255, 0.06); }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: white; font-family: 'Segoe UI', sans-serif; overflow: hidden; display: flex; align-items: center; justify-content: center; }
         
-        .fade-out { opacity: 0; transform: scale(1.1); transition: 0.8s ease-in-out; pointer-events: none; }
+        /* 背景アニメーション */
+        .glass-bg { position: fixed; inset: 0; z-index: -1; background: radial-gradient(circle at 50% 50%, #111, #000); }
+        .blob { position: absolute; width: 90vw; height: 90vw; background: radial-gradient(circle, rgba(0, 242, 255, 0.08), transparent 70%); animation: move 18s infinite alternate; }
+        @keyframes move { from { transform: translate(-15%, -15%); } to { transform: translate(15%, 15%); } }
+
+        .main-panel { background: var(--glass); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 40px; padding: 40px; width: 85%; max-width: 360px; text-align: center; z-index: 100; box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+        .logo { width: 110px; height: auto; margin-bottom: 15px; filter: drop-shadow(0 0 15px var(--accent)); }
+        h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -1px; }
+        .subtitle { color: var(--accent); font-size: 9px; letter-spacing: 4px; text-transform: uppercase; margin-bottom: 35px; opacity: 0.7; }
+
+        /* ボタン共通 */
+        .btn { border: none; border-radius: 18px; padding: 15px; width: 100%; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 12px; cursor: pointer; transition: 0.3s; margin-bottom: 12px; outline: none; }
+        .btn:active { transform: scale(0.96); }
+
+        /* Googleボタン */
+        .btn-google { background: white; color: black; }
+        .btn-google:hover { box-shadow: 0 0 20px rgba(255, 255, 255, 0.3); }
+
+        /* Scratch Authボタン */
+        .btn-scratch { background: #4d97ff; color: white; }
+        .btn-scratch:hover { box-shadow: 0 0 20px rgba(77, 151, 255, 0.5); }
+
+        #status { margin-top: 20px; font-family: monospace; font-size: 9px; color: #666; letter-spacing: 1px; }
+        .fade-out { opacity: 0; transform: scale(1.05); transition: 0.8s; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -71,19 +42,19 @@
     <div id="app-container" class="main-panel">
         <img src="./logo.png" class="logo" alt="Axalith" onerror="this.src='https://raw.githubusercontent.com/chi20253032/Axalith-Cloud/main/logo.png'">
         <h1>Axalith Cloud</h1>
-        <div class="subtitle">Secure Gateway v2.3</div>
+        <div class="subtitle">Gateway System v2.4</div>
 
-        <button id="google-login" class="btn-google">
-            <svg width="20" height="20" viewBox="0 0 24 24">
-                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-            </svg>
+        <button id="google-login" class="btn btn-google">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.66l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
             Googleでログイン
         </button>
 
-        <div id="status">System Ready</div>
+        <button id="scratch-login" class="btn btn-scratch">
+            <img src="https://scratch.mit.edu/favicon.ico" width="18" height="18" style="border-radius: 4px;">
+            Scratch Authでログイン
+        </button>
+
+        <div id="status">System: Ready to Sync</div>
     </div>
 
     <script type="module">
@@ -103,35 +74,42 @@
         const auth = getAuth(app);
         const provider = new GoogleAuthProvider();
 
-        const loginBtn = document.getElementById('google-login');
-        const statusText = document.getElementById('status');
+        const status = document.getElementById('status');
         const container = document.getElementById('app-container');
 
-        loginBtn.onclick = async () => {
-            statusText.innerText = "AUTHENTICATING...";
+        // パルス信号送信の共通化
+        const sendPulse = (data) => {
+            console.log("Axalith: Sending pulse...", data);
+            // iframeとしての親、またはポップアップとしての親、両方に送信を試みる
+            const target = window.parent !== window ? window.parent : window.opener;
+            if (target) {
+                target.postMessage(data, "*");
+            }
+        };
+
+        // Google ログイン
+        document.getElementById('google-login').onclick = async () => {
+            status.innerText = "Connecting to Google...";
             try {
                 const result = await signInWithPopup(auth, provider);
-                const user = result.user;
-
-                // 信号送信
-                const pulse = {
-                    type: "AXALITH_GOOGLE_SUCCESS",
-                    userName: user.displayName,
-                    uid: user.uid
-                };
-                
-                // 親ウィンドウへ送信
-                window.parent.postMessage(pulse, "*");
-                
-                statusText.innerHTML = "<span class='success-state'>ACCESS GRANTED</span>";
+                sendPulse({ type: "AXALITH_GOOGLE_SUCCESS", userName: result.user.displayName, uid: result.user.uid });
+                status.innerText = "Success: Link Established";
                 container.classList.add('fade-out');
-
-                console.log("Axalith: Data sent to PenguinMod.");
-
-            } catch (error) {
-                console.error(error);
-                statusText.innerText = "AUTH_FAILED: " + error.code;
+            } catch (e) {
+                status.innerText = "Error: " + e.code;
             }
+        };
+
+        // Scratch Auth ログイン (仮実装: 必要に応じてURLを変更してください)
+        document.getElementById('scratch-login').onclick = () => {
+            status.innerText = "Connecting to Scratch...";
+            // 代表の Scratch Auth プロジェクトや連携サイトがある場合はここに記述
+            // 今回はデモとして信号だけ送信テスト可能にします
+            setTimeout(() => {
+                sendPulse({ type: "AXALITH_SCRATCH_SUCCESS", userName: "ScratchUser" });
+                status.innerText = "Success: Scratch Linked";
+                container.classList.add('fade-out');
+            }, 1000);
         };
     </script>
 </body>
